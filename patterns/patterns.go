@@ -26,21 +26,25 @@ func validateMotif(motif string) error {
 //
 // This returns (row, overhang) for this row.
 func fillRow(overhang int, motif string, fabricWidth int) (string, int) {
+
 	// The actual string that went past the end of the last row, it represents
 	// the start of this row.
 	overhangStr := motif[len(motif)-overhang:]
 
 	// The overhang from the previous row was so long it fills the entire row
 	if overhang > fabricWidth {
-		return overhangStr[:fabricWidth], fabricWidth - overhang
+		return overhangStr[:fabricWidth], overhang - fabricWidth
 	}
 
-	repeats := len(motif) / (fabricWidth - overhang)
-	remaining := len(motif) % (fabricWidth - overhang)
+	repeats := (fabricWidth - overhang) / len(motif)
+	remaining := (fabricWidth - overhang) % len(motif)
 
-	row := overhangStr + strings.Repeat(motif, repeats) + motif[remaining:]
-	nextOverhang := len(motif) - remaining
+	nextOverhang := 0
+	if remaining != 0 {
+		nextOverhang = len(motif) - remaining
+	}
 
+	row := overhangStr + strings.Repeat(motif, repeats) + motif[:remaining]
 	return row, nextOverhang
 }
 
@@ -54,7 +58,8 @@ func generateRawPattern(motif string, fabricWidth int) []string {
 	overhang := 0
 	rows := []string{}
 	for {
-		row, overhang := fillRow(overhang, motif, fabricWidth)
+		var row string
+		row, overhang = fillRow(overhang, motif, fabricWidth)
 		rows = append(rows, row)
 		if overhang == 0 {
 			break
