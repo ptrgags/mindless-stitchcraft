@@ -2,6 +2,7 @@ package patterns
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 )
 
@@ -248,8 +249,42 @@ func checkShape(rows []string, expectedWidth int, expectedHeight int) error {
 }
 
 func TestGeneratePrintablePattern(t *testing.T) {
-	t.Run("invalid input", func(t *testing.T) {
-		t.Fail()
+	t.Run("invalid motif returns error", func(t *testing.T) {
+		validFabricWidth := 5
+		cases := []struct {
+			label         string
+			motif         string
+			expectedError string
+		}{
+			{"motif empty", "", "motif must not be empty"},
+			{"motif has invalid characters", "--🧶vv", "motif has invalid characters"},
+		}
+
+		for _, tc := range cases {
+			rows, err := GeneratePrintablePattern(tc.motif, validFabricWidth)
+			if err == nil || !strings.Contains(err.Error(), tc.expectedError) {
+				t.Errorf("Expected error '%v', got (%v, %v)", tc.expectedError, rows, err)
+			}
+		}
+	})
+
+	t.Run("invalid fabricWidth returns error", func(t *testing.T) {
+		validMotif := "v--v-"
+		cases := []struct {
+			label       string
+			fabricWidth int
+		}{
+			{"zero", 0},
+			{"negative", -1},
+		}
+		expectedError := "fabricWidth must be a positive integer"
+
+		for _, tc := range cases {
+			rows, err := GeneratePrintablePattern(validMotif, tc.fabricWidth)
+			if err == nil || !strings.Contains(err.Error(), expectedError) {
+				t.Errorf("Expected error '%v', got (%v, %v)", expectedError, rows, err)
+			}
+		}
 	})
 
 	t.Run("generated pattern is the correct shape", func(t *testing.T) {

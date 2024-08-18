@@ -9,12 +9,12 @@ import (
 // Check that a motif is nonempty and is composed of 'v' and '-' runes.
 func validateMotif(motif string) error {
 	if len(motif) == 0 {
-		return errors.New("invalid motif: must be a non-empty string")
+		return errors.New("motif must not be empty")
 	}
 
 	for _, r := range motif {
 		if r != 'v' && r != '-' {
-			return errors.New("invalid motif: must be a string of knits ('v') and purls ('-')")
+			return errors.New("motif has invalid characters. It must be a string of knits ('v') and purls ('-')")
 		}
 	}
 
@@ -137,6 +137,10 @@ func handleReverseRows(rows []string) []string {
 func GeneratePattern(motif string, fabricWidth int) ([]string, error) {
 	if err := validateMotif(motif); err != nil {
 		return nil, err
+	}
+
+	if fabricWidth < 1 {
+		return nil, errors.New("fabricWidth must be a positive integer")
 	}
 
 	rows := generateRawPattern(motif, fabricWidth)
