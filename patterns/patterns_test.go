@@ -248,7 +248,7 @@ func checkShape(rows []string, expectedWidth int, expectedHeight int) error {
 	return nil
 }
 
-func TestGeneratePrintablePattern(t *testing.T) {
+func TestGeneratePattern(t *testing.T) {
 	t.Run("invalid motif returns error", func(t *testing.T) {
 		validFabricWidth := 5
 		cases := []struct {
@@ -261,7 +261,7 @@ func TestGeneratePrintablePattern(t *testing.T) {
 		}
 
 		for _, tc := range cases {
-			rows, err := GeneratePrintablePattern(tc.motif, validFabricWidth)
+			rows, err := GeneratePattern(tc.motif, validFabricWidth)
 			if err == nil || !strings.Contains(err.Error(), tc.expectedError) {
 				t.Errorf("Expected error '%v', got (%v, %v)", tc.expectedError, rows, err)
 			}
@@ -280,7 +280,7 @@ func TestGeneratePrintablePattern(t *testing.T) {
 		expectedError := "fabricWidth must be a positive integer"
 
 		for _, tc := range cases {
-			rows, err := GeneratePrintablePattern(validMotif, tc.fabricWidth)
+			rows, err := GeneratePattern(validMotif, tc.fabricWidth)
 			if err == nil || !strings.Contains(err.Error(), expectedError) {
 				t.Errorf("Expected error '%v', got (%v, %v)", expectedError, rows, err)
 			}
@@ -307,7 +307,7 @@ func TestGeneratePrintablePattern(t *testing.T) {
 		}
 
 		for _, tc := range cases {
-			rows, err := GeneratePrintablePattern(tc.motif, tc.fabricWidth)
+			rows, err := GeneratePattern(tc.motif, tc.fabricWidth)
 			if err != nil {
 				t.Errorf("Expected no errors, got (%v, %v)", rows, err)
 			}
@@ -343,7 +343,7 @@ func TestGeneratePrintablePattern(t *testing.T) {
 		}
 
 		for _, tc := range cases {
-			rows, err := GeneratePrintablePattern(tc.motif, tc.fabricWidth)
+			rows, err := GeneratePattern(tc.motif, tc.fabricWidth)
 			if err != nil {
 				t.Errorf("Expected no errors, got (%v, %v)", rows, err)
 			}
@@ -372,7 +372,7 @@ func TestGeneratePrintablePattern(t *testing.T) {
 			{"len(motif) > fabricWidth, noncoprime widths", "----", 2, []string{}},
 		}
 		for _, tc := range cases {
-			rows, err := GeneratePrintablePattern(tc.motif, tc.fabricWidth)
+			rows, err := GeneratePattern(tc.motif, tc.fabricWidth)
 			if err != nil {
 				t.Errorf("Expected no errors, got (%v, %v)", rows, err)
 			}
@@ -409,7 +409,7 @@ func TestGeneratePrintablePattern(t *testing.T) {
 		}
 
 		for _, tc := range cases {
-			rows, err := GeneratePrintablePattern(tc.motif, tc.fabricWidth)
+			rows, err := GeneratePattern(tc.motif, tc.fabricWidth)
 			if err != nil {
 				t.Errorf("Expected no errors, got (%v, %v)", rows, err)
 			}

@@ -146,6 +146,7 @@ func GeneratePattern(motif string, fabricWidth int) ([]string, error) {
 	rows := generateRawPattern(motif, fabricWidth)
 	rows = ensureEvenRowCount(rows)
 	rows = handleReverseRows(rows)
+	rows = rotate180(rows)
 
 	return rows, nil
 }
@@ -158,12 +159,4 @@ func rotate180(rows []string) []string {
 	}
 
 	return rotated
-}
-
-func GeneratePrintablePattern(motif string, fabricWidth int) ([]string, error) {
-	result, err := GeneratePattern(motif, fabricWidth)
-	if err != nil {
-		return nil, err
-	}
-	return rotate180(result), nil
 }
