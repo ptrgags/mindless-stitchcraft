@@ -5,7 +5,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/ptrgags/mindless-knitting/patterns"
+	"github.com/ptrgags/mindless-stitchcraft/patterns"
 )
 
 func main() {
