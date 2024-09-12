@@ -10,11 +10,11 @@ import (
 
 func main() {
 
+	fmt.Println(os.Args)
 	pattern := os.Args[2]
 	fabricWidth, _ := strconv.Atoi(os.Args[3])
-	fmt.Println(os.Args)
 
-	rows, _ := patterns.GeneratePrintablePattern(pattern, fabricWidth)
+	rows, _ := patterns.GeneratePattern(pattern, fabricWidth)
 	for _, row := range rows {
 		fmt.Println(row)
 	}
