@@ -67,3 +67,43 @@ func Equals(a Permutation, b Permutation) bool {
 
 	return true
 }
+
+func gcd(a uint, b uint) uint {
+	if b > a {
+		return gcd(b, a)
+	}
+
+	if a == 0 {
+		return b
+	}
+
+	return gcd(b, a%b)
+}
+
+func lcm(a uint, b uint) uint {
+	return a * b / gcd(a, b)
+}
+
+func Order(perm Permutation) uint {
+	n := len(perm.values)
+	visited := make([]bool, n)
+
+	var order uint = 1
+	for i := 0; i < n; i++ {
+		if visited[i] {
+			continue
+		}
+
+		visited[i] = true
+		current := int(perm.values[i])
+		var cycleLength uint = 1
+		for current != i {
+			visited[current] = true
+			current = int(perm.values[i])
+			cycleLength++
+		}
+		order = lcm(order, cycleLength)
+	}
+
+	return order
+}

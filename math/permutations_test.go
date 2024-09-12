@@ -161,3 +161,61 @@ func TestPermutationEquals(t *testing.T) {
 		}
 	})
 }
+func TestPermutationOrder(t *testing.T) {
+	t.Run("Identity permutation has order 1", func(t *testing.T) {
+		// |1| = 1
+		identity, _ := MakePermutation([]uint{0, 1, 2, 3, 4})
+		order := Order(identity)
+
+		var expectedOrder uint = 1
+		if order != expectedOrder {
+			t.Errorf("Expected %v, got %v", expectedOrder, order)
+		}
+	})
+
+	t.Run("Simple swap has order 2", func(t *testing.T) {
+		// |(1 2)| = 2
+		swap, _ := MakePermutation([]uint{0, 2, 1, 3, 4})
+		order := Order(swap)
+
+		var expectedOrder uint = 2
+		if order != expectedOrder {
+			t.Errorf("Expected %v, got %v", expectedOrder, order)
+		}
+	})
+
+	t.Run("Simple cycle returns length of cycle", func(t *testing.T) {
+		// |(1 2 3)| = 3
+		cycle, _ := MakePermutation([]uint{0, 2, 3, 1, 4})
+		order := Order(cycle)
+
+		var expectedOrder uint = 3
+		if order != expectedOrder {
+			t.Errorf("Expected %v, got %v", expectedOrder, order)
+		}
+	})
+
+	t.Run("Disjoint swaps have order 2", func(t *testing.T) {
+		// Two independent swap will both swap back to identity if
+		// applied twice.
+		// |(0 3)(1 2)| = 2
+		twoSwaps, _ := MakePermutation([]uint{3, 2, 1, 0, 4})
+		order := Order(twoSwaps)
+
+		var expectedOrder uint = 2
+		if order != expectedOrder {
+			t.Errorf("Expected %v, got %v", expectedOrder, order)
+		}
+	})
+
+	t.Run("multiple cycles will have an order based on the lcm of their lengths", func(t *testing.T) {
+		// |(0 1)(2 3 4)(5 6 7 8)| = lcm(2, 3, 4) = lcm(6, 4) = 12
+		twoSwaps, _ := MakePermutation([]uint{1, 0, 3, 4, 2, 6, 7, 8, 5})
+		order := Order(twoSwaps)
+
+		var expectedOrder uint = 12
+		if order != expectedOrder {
+			t.Errorf("Expected %v, got %v", expectedOrder, order)
+		}
+	})
+}
