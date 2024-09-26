@@ -1,4 +1,4 @@
-package math
+package stitchmath
 
 import (
 	"errors"
@@ -7,6 +7,15 @@ import (
 
 type Permutation struct {
 	values []uint
+}
+
+func MakeIdentity(length int) Permutation {
+	values := make([]uint, length)
+	for i := 0; i < length; i++ {
+		values[i] = uint(i)
+	}
+
+	return Permutation{values}
 }
 
 func MakePermutation(values []uint) (Permutation, error) {

@@ -54,3 +54,7 @@ func ParseKnots(knotString string) ([]Knot, error) {
 
 	return result, nil
 }
+
+func SwapsStrands(knot Knot) bool {
+	return knot == ForwardKnot || knot == BackwardKnot
+}

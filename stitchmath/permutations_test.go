@@ -1,4 +1,4 @@
-package math
+package stitchmath
 
 import (
 	"fmt"
