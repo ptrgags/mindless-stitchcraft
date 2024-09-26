@@ -1,6 +1,7 @@
 package math
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 )
@@ -161,10 +162,100 @@ func TestPermutationEquals(t *testing.T) {
 		}
 	})
 }
+
+func checkCycleDecompositionsEqual(actualCycles [][]uint, expectedCycles [][]uint) error {
+	if len(actualCycles) != len(expectedCycles) {
+		return fmt.Errorf("Lengths don't match! actual=%v, expected=%v", actualCycles, expectedCycles)
+	}
+
+	for i, actualCycle := range actualCycles {
+		expectedCycle := expectedCycles[i]
+
+		if len(actualCycle) != len(expectedCycle) {
+			return fmt.Errorf("cycle %d lengths don't match!: %v vs %v, actual=%v, expected=%v", i, actualCycle, expectedCycle, actualCycles, expectedCycles)
+		}
+
+		for j, actualElement := range actualCycle {
+			if actualElement != expectedCycle[j] {
+				return fmt.Errorf("Mismatch at cycle %d, element %d: %v != %v, actual=%v, expected=%v", i, j, actualElement, expectedCycle[j], actualCycles, expectedCycles)
+			}
+		}
+	}
+
+	return nil
+
+}
+
+func TestPermutationCycleDecomposition(t *testing.T) {
+	t.Run("Identity permutation returns each element as 1-cycles", func(t *testing.T) {
+		identity, _ := MakePermutation([]uint{0, 1, 2, 3, 4})
+
+		result := CycleDecomposition(identity)
+
+		expectedRows := [][]uint{
+			{0},
+			{1},
+			{2},
+			{3},
+			{4},
+		}
+		checkErr := checkCycleDecompositionsEqual(result, expectedRows)
+		if checkErr != nil {
+			t.Error(checkErr.Error())
+		}
+	})
+
+	t.Run("Involution has one pair and the rest 1-cycles", func(t *testing.T) {
+		involution, _ := MakePermutation([]uint{1, 0, 2, 3})
+
+		result := CycleDecomposition(involution)
+
+		expectedCycles := [][]uint{
+			{0, 1},
+			{2},
+			{3},
+		}
+		checkErr := checkCycleDecompositionsEqual(result, expectedCycles)
+		if checkErr != nil {
+			t.Error(checkErr.Error())
+		}
+	})
+
+	t.Run("Cycle through all elements returns a single cycle", func(t *testing.T) {
+		cycleBackwards, _ := MakePermutation([]uint{3, 0, 1, 2})
+
+		result := CycleDecomposition(cycleBackwards)
+
+		expectedCycles := [][]uint{
+			{0, 3, 2, 1},
+		}
+		checkErr := checkCycleDecompositionsEqual(result, expectedCycles)
+		if checkErr != nil {
+			t.Error(checkErr.Error())
+		}
+	})
+
+	t.Run("Multiple cycles are deinterleaved", func(t *testing.T) {
+		multipleCycles, _ := MakePermutation([]uint{2, 5, 4, 1, 0, 3})
+
+		result := CycleDecomposition(multipleCycles)
+
+		expectedCycles := [][]uint{
+			{0, 2, 4},
+			{1, 5, 3},
+		}
+		checkErr := checkCycleDecompositionsEqual(result, expectedCycles)
+		if checkErr != nil {
+			t.Error(checkErr.Error())
+		}
+	})
+}
+
 func TestPermutationOrder(t *testing.T) {
 	t.Run("Identity permutation has order 1", func(t *testing.T) {
 		// |1| = 1
 		identity, _ := MakePermutation([]uint{0, 1, 2, 3, 4})
+
 		order := Order(identity)
 
 		var expectedOrder uint = 1
@@ -176,6 +267,7 @@ func TestPermutationOrder(t *testing.T) {
 	t.Run("Simple swap has order 2", func(t *testing.T) {
 		// |(1 2)| = 2
 		swap, _ := MakePermutation([]uint{0, 2, 1, 3, 4})
+
 		order := Order(swap)
 
 		var expectedOrder uint = 2
@@ -187,6 +279,7 @@ func TestPermutationOrder(t *testing.T) {
 	t.Run("Simple cycle returns length of cycle", func(t *testing.T) {
 		// |(1 2 3)| = 3
 		cycle, _ := MakePermutation([]uint{0, 2, 3, 1, 4})
+
 		order := Order(cycle)
 
 		var expectedOrder uint = 3
@@ -200,6 +293,7 @@ func TestPermutationOrder(t *testing.T) {
 		// applied twice.
 		// |(0 3)(1 2)| = 2
 		twoSwaps, _ := MakePermutation([]uint{3, 2, 1, 0, 4})
+
 		order := Order(twoSwaps)
 
 		var expectedOrder uint = 2
@@ -211,6 +305,7 @@ func TestPermutationOrder(t *testing.T) {
 	t.Run("multiple cycles will have an order based on the lcm of their lengths", func(t *testing.T) {
 		// |(0 1)(2 3 4)(5 6 7 8)| = lcm(2, 3, 4) = lcm(6, 4) = 12
 		twoSwaps, _ := MakePermutation([]uint{1, 0, 3, 4, 2, 6, 7, 8, 5})
+
 		order := Order(twoSwaps)
 
 		var expectedOrder uint = 12

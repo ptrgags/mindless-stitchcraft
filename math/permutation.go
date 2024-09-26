@@ -73,8 +73,8 @@ func gcd(a uint, b uint) uint {
 		return gcd(b, a)
 	}
 
-	if a == 0 {
-		return b
+	if b == 0 {
+		return a
 	}
 
 	return gcd(b, a%b)
@@ -84,24 +84,57 @@ func lcm(a uint, b uint) uint {
 	return a * b / gcd(a, b)
 }
 
-func Order(perm Permutation) uint {
+func findCycle(values []uint, start_index int, visited []bool) []uint {
+	n := len(values)
+	// The longest possible cycles use N elements.
+	result := make([]uint, 1, n)
+	result[0] = uint(start_index)
+
+	current_index := start_index
+	for i := 0; i < n; i++ {
+		element := values[uint(current_index)]
+		visited[int(element)] = true
+
+		if element == result[0] {
+			break
+		}
+
+		result = append(result, element)
+		current_index = int(element)
+	}
+
+	return result
+
+}
+
+func CycleDecomposition(perm Permutation) [][]uint {
 	n := len(perm.values)
+
+	// The length will be at most n for an identity permutation, and otherwise
+	// less than this
+	result := make([][]uint, 0, n)
 	visited := make([]bool, n)
 
-	var order uint = 1
+	// Cycles are listed from smallest to largest
 	for i := 0; i < n; i++ {
+		// We already visited this element in a previous iteration
 		if visited[i] {
 			continue
 		}
-
 		visited[i] = true
-		current := int(perm.values[i])
-		var cycleLength uint = 1
-		for current != i {
-			visited[current] = true
-			current = int(perm.values[i])
-			cycleLength++
-		}
+
+		result = append(result, findCycle(perm.values, i, visited))
+	}
+
+	return result
+}
+
+func Order(perm Permutation) uint {
+	cycles := CycleDecomposition(perm)
+
+	order := uint(1)
+	for _, cycle := range cycles {
+		cycleLength := uint(len(cycle))
 		order = lcm(order, cycleLength)
 	}
 
