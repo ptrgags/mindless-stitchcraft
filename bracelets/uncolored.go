@@ -50,8 +50,14 @@ func GenerateUncoloredPattern(strandCount uint, motif []Knot) ([]string, error) 
 	oddStitchCount := evenStitchCount - 1
 
 	result := []string{}
+	// The cursor loops over the motif
 	cursor := uint(0)
 	for i := 0; i < len(motif); i++ {
+		// Detect pattern repeat
+		if i > 0 && cursor == 0 {
+			break
+		}
+
 		evenKnots := collectKnots(motif, cursor, evenStitchCount)
 		evenRow := formatEvenRow(evenKnots)
 		cursor += evenStitchCount
@@ -61,14 +67,7 @@ func GenerateUncoloredPattern(strandCount uint, motif []Knot) ([]string, error) 
 		cursor += oddStitchCount
 
 		cursor %= uint(len(motif))
-
-		// Detect pattern repeat
-		if i > 0 && cursor == 0 {
-			break
-		}
-
 		result = append(result, evenRow, oddRow)
-
 	}
 
 	return result, nil
