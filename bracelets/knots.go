@@ -58,3 +58,18 @@ func ParseKnots(knotString string) ([]Knot, error) {
 func SwapsStrands(knot Knot) bool {
 	return knot == ForwardKnot || knot == BackwardKnot
 }
+
+type VisibleStrand int
+
+const (
+	LeftStrand = iota
+	RightStrand
+)
+
+func GetVisibleStrand(knot Knot) VisibleStrand {
+	if knot == ForwardKnot || knot == ForwardBackwardKnot {
+		return LeftStrand
+	}
+
+	return RightStrand
+}

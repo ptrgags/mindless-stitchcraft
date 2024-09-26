@@ -9,6 +9,16 @@ type Permutation struct {
 	values []uint
 }
 
+func (p Permutation) ElementCount() int {
+	return len(p.values)
+}
+
+func (p Permutation) GetValues() []uint {
+	clone := make([]uint, len(p.values))
+	copy(clone, p.values)
+	return clone
+}
+
 func MakeIdentity(length int) Permutation {
 	values := make([]uint, length)
 	for i := 0; i < length; i++ {
