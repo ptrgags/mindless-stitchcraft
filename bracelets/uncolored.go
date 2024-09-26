@@ -34,13 +34,13 @@ func formatOddRow(knots []Knot) string {
 	return fmt.Sprintf(" %s ", formatEvenRow(knots))
 }
 
-func GenerateUncoloredPattern(strandCount uint, motif []Knot) ([]string, error) {
+func GenerateUncoloredKnots(strandCount uint, motif []Knot) ([][]Knot, error) {
 	if strandCount == 0 {
-		return []string{}, errors.New("strandCount must be at least 2")
+		return [][]Knot{}, errors.New("strandCount must be at least 2")
 	}
 
 	if strandCount%2 != 0 {
-		return []string{}, errors.New("strandCount must be an even number")
+		return [][]Knot{}, errors.New("strandCount must be an even number")
 	}
 
 	// Stitches are staggered like this:
@@ -49,7 +49,7 @@ func GenerateUncoloredPattern(strandCount uint, motif []Knot) ([]string, error) 
 	evenStitchCount := strandCount / 2
 	oddStitchCount := evenStitchCount - 1
 
-	result := []string{}
+	result := [][]Knot{}
 	// The cursor loops over the motif
 	cursor := uint(0)
 	for i := 0; i < len(motif); i++ {
@@ -59,16 +59,33 @@ func GenerateUncoloredPattern(strandCount uint, motif []Knot) ([]string, error) 
 		}
 
 		evenKnots := collectKnots(motif, cursor, evenStitchCount)
-		evenRow := formatEvenRow(evenKnots)
 		cursor += evenStitchCount
 
 		oddKnots := collectKnots(motif, cursor, oddStitchCount)
-		oddRow := formatOddRow(oddKnots)
 		cursor += oddStitchCount
 
 		cursor %= uint(len(motif))
-		result = append(result, evenRow, oddRow)
+		result = append(result, evenKnots, oddKnots)
 	}
 
+	return result, nil
+}
+
+func GenerateUncoloredPattern(strandCount uint, motif []Knot) ([]string, error) {
+	knotRows, err := GenerateUncoloredKnots(strandCount, motif)
+	if err != nil {
+		return []string{}, err
+	}
+
+	result := []string{}
+	for i, knots := range knotRows {
+		var formattedRow string
+		if i%2 == 0 {
+			formattedRow = formatEvenRow(knots)
+		} else {
+			formattedRow = formatOddRow(knots)
+		}
+		result = append(result, formattedRow)
+	}
 	return result, nil
 }
