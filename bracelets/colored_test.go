@@ -3,130 +3,63 @@ package bracelets
 import (
 	"testing"
 
-	"github.com/ptrgags/mindless-stitchcraft/stitchmath"
+	"github.com/ptrgags/mindless-stitchcraft/checks"
 )
 
-func TestEvenRowPermutation(t *testing.T) {
+func TestGenerateColoredPattern(t *testing.T) {
+	t.Run("strandCount greater than alphabet length returns error", func(t *testing.T) {
+		strands := uint(28)
+		anyMotif, _ := ParseKnots("///")
 
-	t.Run("Empty knots results in error", func(t *testing.T) {
-		knots := []Knot{}
+		result, err := GenerateColoredPattern(strands, anyMotif)
 
-		result, err := EvenRowPermutation(knots)
-
-		if err == nil {
-			t.Errorf("Expected error, got (%v, %v)", result, err)
-		}
+		checks.CheckHasError(t, result, err, "strandCount must be at most 26")
 	})
 
-	t.Run("Row with knots does not return error", func(t *testing.T) {
-		knots := []Knot{ForwardBackwardKnot, BackwardForwardKnot}
+	t.Run("odd strandCount returns error", func(t *testing.T) {
+		strands := uint(5)
+		anyMotif, _ := ParseKnots("///")
 
-		result, err := EvenRowPermutation(knots)
+		result, err := GenerateColoredPattern(strands, anyMotif)
 
-		if err != nil {
-			t.Errorf("Expected no error, got (%v, %v)", result, err)
-		}
+		checks.CheckHasError(t, result, err, "strandCount must be an even number")
 	})
 
-	t.Run("Row with only forward-backward or backward-forward knots returns identity", func(t *testing.T) {
-		knots := []Knot{ForwardBackwardKnot, ForwardBackwardKnot, BackwardForwardKnot}
+	t.Run("zero strandCount returns error", func(t *testing.T) {
+		strands := uint(0)
+		anyMotif, _ := ParseKnots("///")
 
-		result, _ := EvenRowPermutation(knots)
+		result, err := GenerateColoredPattern(strands, anyMotif)
 
-		identity := stitchmath.MakeIdentity(6)
-		if !stitchmath.Equals(result, identity) {
-			t.Errorf("Expected result to be the identity permutation, got %v", result)
-		}
+		checks.CheckHasError(t, result, err, "strandCount must be at least 2")
 	})
 
-	t.Run("Row with only forward or backward knots swaps all strands", func(t *testing.T) {
-		knots := []Knot{BackwardKnot, ForwardKnot, BackwardKnot, ForwardKnot}
+	// I was noticing that the spacing on odd rows is doubled for two strands
+	t.Run("Two strand pattern that swaps strands does not have extra spacing", func(t *testing.T) {
+		strands := uint(2)
+		motifThatSwapsStrands, _ := ParseKnots("/")
 
-		result, _ := EvenRowPermutation(knots)
+		result, err := GenerateColoredPattern(strands, motifThatSwapsStrands)
 
-		// Swap each pair of adjacent strands
-		identity, _ := stitchmath.MakePermutation([]uint{
-			1, 0, 3, 2, 5, 4, 7, 6,
-		})
-
-		if !stitchmath.Equals(result, identity) {
-			t.Errorf("Expected result to be the identity permutation, got %v", result)
-		}
+		checks.CheckHasNoError(t, result, err)
+		// The pattern will have 4 rows + 4 header/footer rows
+		expectedWidth := 3
+		expectedHeight := 8
+		checks.CheckStringGridShape(t, result, expectedWidth, expectedHeight)
 	})
 
-	t.Run("Row with mixed knots computes the correct permutation", func(t *testing.T) {
-		knots := []Knot{ForwardKnot, ForwardBackwardKnot, BackwardKnot, BackwardForwardKnot}
+	t.Run("Two strand pattern that does not swap strands does not have extra spacing", func(t *testing.T) {
+		strands := uint(2)
+		motifThatSwapsStrands, _ := ParseKnots(">")
 
-		result, _ := EvenRowPermutation(knots)
+		result, err := GenerateColoredPattern(strands, motifThatSwapsStrands)
 
-		identity, _ := stitchmath.MakePermutation([]uint{
-			1, 0, 2, 3, 5, 4, 6, 7,
-		})
-
-		if !stitchmath.Equals(result, identity) {
-			t.Errorf("Expected result to be the identity permutation, got %v", result)
-		}
-	})
-}
-
-func TestOddRowPermutation(t *testing.T) {
-	t.Run("Empty knots results in identity", func(t *testing.T) {
-		knots := []Knot{}
-
-		result, err := OddRowPermutation(knots)
-
-		// The left and right strands are unused.
-		identity := stitchmath.MakeIdentity(2)
-		if !stitchmath.Equals(result, identity) {
-			t.Errorf("expected result to be the identity permutation, got (%v, %v)", result, err)
-		}
+		checks.CheckHasNoError(t, result, err)
+		// The pattern will have 2 rows + 4 header/footer rows
+		expectedWidth := 3
+		expectedHeight := 6
+		checks.CheckStringGridShape(t, result, expectedWidth, expectedHeight)
 	})
 
-	t.Run("Row with knots does not return error", func(t *testing.T) {
-		knots := []Knot{ForwardBackwardKnot, BackwardForwardKnot}
-
-		result, err := OddRowPermutation(knots)
-
-		if err != nil {
-			t.Errorf("Expected no error, got (%v, %v)", result, err)
-		}
-	})
-
-	t.Run("Row with only forward-backward or backward-forward knots returns identity", func(t *testing.T) {
-		knots := []Knot{ForwardBackwardKnot, ForwardBackwardKnot, BackwardForwardKnot}
-
-		result, err := OddRowPermutation(knots)
-
-		identity := stitchmath.MakeIdentity(8)
-		if !stitchmath.Equals(result, identity) {
-			t.Errorf("Expected result to be the identity permutation, got %v, %v", result, err)
-		}
-	})
-
-	t.Run("Row with only forward or backward knots swaps all strands except first and last", func(t *testing.T) {
-		knots := []Knot{BackwardKnot, ForwardKnot, BackwardKnot, ForwardKnot}
-
-		result, err := OddRowPermutation(knots)
-
-		// Swap each pair of adjacent strands
-		expected, _ := stitchmath.MakePermutation([]uint{
-			0, 2, 1, 4, 3, 6, 5, 8, 7, 9,
-		})
-		if !stitchmath.Equals(result, expected) {
-			t.Errorf("Expected result to be %v, got (%v, %v)", expected, result, err)
-		}
-	})
-
-	t.Run("Row with mixed knots computes the correct permutation", func(t *testing.T) {
-		knots := []Knot{ForwardKnot, ForwardBackwardKnot, BackwardKnot, BackwardForwardKnot}
-
-		result, err := OddRowPermutation(knots)
-
-		expected, _ := stitchmath.MakePermutation([]uint{
-			0, 2, 1, 3, 4, 6, 5, 7, 8, 9,
-		})
-		if !stitchmath.Equals(result, expected) {
-			t.Errorf("Expected result to be %v, got (%v, %v)", expected, result, err)
-		}
-	})
+	t.Errorf("To be continued...")
 }

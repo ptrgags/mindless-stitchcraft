@@ -210,7 +210,12 @@ func formatRows(strandLabels []rune, labeledRows [][]rune) []string {
 			first := string(row[0])
 			middle := joinRunes(row[1:len(row)-1], "   ")
 			last := string(row[len(row)-1])
-			result[2+i] = fmt.Sprintf("%s  %s  %s", first, middle, last)
+
+			if middle == "" {
+				result[2+i] = fmt.Sprintf("%s %s", first, last)
+			} else {
+				result[2+i] = fmt.Sprintf("%s  %s  %s", first, middle, last)
+			}
 		}
 	}
 	result[len(result)-2] = straightString
