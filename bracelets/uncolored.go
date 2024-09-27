@@ -21,7 +21,7 @@ func collectKnots(motif []Knot, cursor uint, count uint) []Knot {
 func formatEvenRow(knots []Knot) string {
 	knotStrings := make([]string, len(knots))
 	for i, knot := range knots {
-		r, _ := ToRune(knot)
+		r, _ := knot.ToRune()
 		knotStrings[i] = string(r)
 	}
 

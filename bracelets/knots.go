@@ -25,7 +25,7 @@ var runesToKnots = map[rune]Knot{
 	'<':  BackwardForwardKnot,
 }
 
-func ToRune(knot Knot) (rune, error) {
+func (knot Knot) ToRune() (rune, error) {
 	if r, ok := knotsToRune[knot]; ok {
 		return r, nil
 	}
@@ -33,29 +33,7 @@ func ToRune(knot Knot) (rune, error) {
 	return rune(0), fmt.Errorf("unknown knot %v", knot)
 }
 
-func FromRune(r rune) (Knot, error) {
-	if knot, ok := runesToKnots[r]; ok {
-		return knot, nil
-	}
-
-	return -1, fmt.Errorf("unknown knot rune %v", r)
-}
-
-func ParseKnots(knotString string) ([]Knot, error) {
-	result := []Knot{}
-	for _, char := range knotString {
-		knot, err := FromRune(char)
-		if err != nil {
-			return []Knot{}, err
-		}
-
-		result = append(result, knot)
-	}
-
-	return result, nil
-}
-
-func SwapsStrands(knot Knot) bool {
+func (knot Knot) SwapsStrands() bool {
 	return knot == ForwardKnot || knot == BackwardKnot
 }
 
@@ -66,10 +44,32 @@ const (
 	RightStrand
 )
 
-func GetVisibleStrand(knot Knot) VisibleStrand {
+func (knot Knot) GetVisibleStrand() VisibleStrand {
 	if knot == ForwardKnot || knot == ForwardBackwardKnot {
 		return LeftStrand
 	}
 
 	return RightStrand
+}
+
+func fromRune(r rune) (Knot, error) {
+	if knot, ok := runesToKnots[r]; ok {
+		return knot, nil
+	}
+
+	return -1, fmt.Errorf("unknown knot %s", string(r))
+}
+
+func ParseKnots(knotString string) ([]Knot, error) {
+	result := []Knot{}
+	for _, char := range knotString {
+		knot, err := fromRune(char)
+		if err != nil {
+			return []Knot{}, err
+		}
+
+		result = append(result, knot)
+	}
+
+	return result, nil
 }

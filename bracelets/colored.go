@@ -17,7 +17,7 @@ func evenRowPermutation(knots []Knot) (stitchmath.Permutation, error) {
 	for i, knot := range knots {
 		leftStrand := 2 * i
 		rightStrand := 2*i + 1
-		if SwapsStrands(knot) {
+		if knot.SwapsStrands() {
 			permutationValues[leftStrand] = uint(rightStrand)
 			permutationValues[rightStrand] = uint(leftStrand)
 		} else {
@@ -43,7 +43,7 @@ func oddRowPermutation(knots []Knot) (stitchmath.Permutation, error) {
 		// the +1 is due to the offset from the fixed strand at position 0
 		leftStrand := 2*i + 1
 		rightStrand := 2*i + 2
-		if SwapsStrands(knot) {
+		if knot.SwapsStrands() {
 			permutationValues[leftStrand] = uint(rightStrand)
 			permutationValues[rightStrand] = uint(leftStrand)
 		} else {
@@ -81,7 +81,7 @@ func colorEvenRow(strands []uint, knots []Knot) []uint {
 		leftStrand := 2 * i
 		rightStrand := 2*i + 1
 
-		if GetVisibleStrand(knot) == LeftStrand {
+		if knot.GetVisibleStrand() == LeftStrand {
 			result[i] = strands[leftStrand]
 		} else {
 			result[i] = strands[rightStrand]
@@ -102,7 +102,7 @@ func colorOddRow(strands []uint, knots []Knot) []uint {
 		leftStrand := 2*i + 1
 		rightStrand := 2*i + 2
 
-		if GetVisibleStrand(knot) == LeftStrand {
+		if knot.GetVisibleStrand() == LeftStrand {
 			result[i+1] = strands[leftStrand]
 		} else {
 			result[i+1] = strands[rightStrand]
