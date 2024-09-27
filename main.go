@@ -60,6 +60,18 @@ func bracelet(args []string) error {
 		fmt.Println(row)
 	}
 
+	coloredRows, err := bracelets.GenerateColoredPattern(uint(strandCount), motif)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("Colored pattern:")
+	for _, row := range coloredRows {
+		fmt.Println(row)
+	}
+
+	fmt.Println("Permutation:")
+
 	return nil
 }
 
