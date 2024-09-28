@@ -41,10 +41,8 @@ func bracelet(args []string) error {
 		return errors.New("usage: main.go bracelet-repeat STRANDS MOTIF")
 	}
 
-	strandCount, err := strconv.Atoi(args[0])
-	if err != nil {
-		return err
-	}
+	strandLabels := []rune(args[0])
+	strandCount := len(strandLabels)
 
 	motif, err := bracelets.ParseKnots(args[1])
 	if err != nil {
@@ -61,7 +59,7 @@ func bracelet(args []string) error {
 		fmt.Println(row)
 	}
 
-	coloredRows, err := repeat.GenerateColoredPattern(uint(strandCount), motif)
+	coloredRows, err := repeat.GenerateColoredPattern(strandLabels, motif)
 	if err != nil {
 		return err
 	}
@@ -70,8 +68,6 @@ func bracelet(args []string) error {
 	for _, row := range coloredRows {
 		fmt.Println(row)
 	}
-
-	fmt.Println("Permutation:")
 
 	return nil
 }

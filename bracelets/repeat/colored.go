@@ -1,7 +1,6 @@
 package repeat
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 
@@ -146,10 +145,16 @@ func getColoredPattern(knotRows [][]bracelets.Knot) ([][]uint, error) {
 	resultRowCount := int(patternRepeats) * inputRows
 
 	n := permutations[0].ElementCount()
-	current := stitchmath.MakeIdentity(n)
+
+	// Inverse of the current chain of permutations.
+	// The forward permutation computes where each strand color
+	// ends up. We want the opposite - for a given strand, which
+	// color ended up here? So use the inverse to compute these
+	// color labels.
+	inversePermutation := stitchmath.MakeIdentity(n)
 	result := make([][]uint, resultRowCount)
 	for i := 0; i < resultRowCount; i++ {
-		strandOrder := current.GetValues()
+		strandOrder := inversePermutation.GetValues()
 		row := knotRows[i%inputRows]
 		permutation := permutations[i%inputRows]
 
@@ -159,7 +164,12 @@ func getColoredPattern(knotRows [][]bracelets.Knot) ([][]uint, error) {
 			result[i] = colorOddRow(strandOrder, row)
 		}
 
-		current, err = stitchmath.Compose(permutation, current)
+		// IMPORTANT - the permutations used here are always involutions,
+		// so A^(-1) = A, B^(-1) = B
+		// so (AB)^-1 = B^(-1)A^(-1) = BA
+		// So reversing the multiplication order computes the inverse product without
+		// having to explicitly compute inverses!
+		inversePermutation, err = stitchmath.Compose(inversePermutation, permutation)
 		if err != nil {
 			return [][]uint{}, err
 		}
@@ -225,12 +235,16 @@ func formatRows(strandLabels []rune, labeledRows [][]rune) []string {
 	return result
 }
 
-func GenerateColoredPattern(strandCount uint, motif []bracelets.Knot) ([]string, error) {
-	allLabels := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
-	if int(strandCount) > len(allLabels) {
-		return []string{}, errors.New("strandCount must be at most 26")
-	}
-	strandLabels := allLabels[:strandCount]
+// Create a preview of the friendship bracelet colored with the
+// strandLabels. This will repeat the pattern until the strands at the
+// bottom equal the strands at the top.
+//
+// strandLabels is a slice of runes representing the colors. In practice
+// usually you have pairs of the same color, so e.g. []rune("ABBA") is valid
+//
+// motif is the list of knots to repeat. See bracelets.ParseKnots
+func GenerateColoredPattern(strandLabels []rune, motif []bracelets.Knot) ([]string, error) {
+	strandCount := uint(len(strandLabels))
 
 	knotRows, err := GenerateUncoloredKnots(strandCount, motif)
 	if err != nil {
