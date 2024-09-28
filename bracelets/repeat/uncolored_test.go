@@ -1,9 +1,11 @@
-package bracelets
+package repeat
 
 import (
 	"fmt"
 	"strings"
 	"testing"
+
+	"github.com/ptrgags/mindless-stitchcraft/bracelets"
 )
 
 func checkRowsEqual(actual []string, expected []string) error {
@@ -24,7 +26,7 @@ func TestGenerateUncoloredPattern(t *testing.T) {
 	t.Run("Zero strands results in error", func(t *testing.T) {
 		noStrands := uint(0)
 
-		result, err := GenerateUncoloredPattern(noStrands, []Knot{BackwardForwardKnot, ForwardBackwardKnot})
+		result, err := GenerateUncoloredPattern(noStrands, []bracelets.Knot{bracelets.BackwardForwardKnot, bracelets.ForwardBackwardKnot})
 
 		expectedError := "strandCount must be at least 2"
 		if err == nil || !strings.Contains(err.Error(), expectedError) {
@@ -35,7 +37,7 @@ func TestGenerateUncoloredPattern(t *testing.T) {
 	t.Run("Odd number of strands returns error", func(t *testing.T) {
 		oddStrands := uint(5)
 
-		result, err := GenerateUncoloredPattern(oddStrands, []Knot{BackwardForwardKnot, ForwardBackwardKnot})
+		result, err := GenerateUncoloredPattern(oddStrands, []bracelets.Knot{bracelets.BackwardForwardKnot, bracelets.ForwardBackwardKnot})
 
 		expectedError := "strandCount must be an even number"
 		if err == nil || !strings.Contains(err.Error(), expectedError) {
@@ -45,7 +47,7 @@ func TestGenerateUncoloredPattern(t *testing.T) {
 
 	t.Run("Valid length and motif does not produce error", func(t *testing.T) {
 		length := uint(6)
-		motif, _ := ParseKnots(`//\\`)
+		motif, _ := bracelets.ParseKnots(`//\\`)
 
 		result, err := GenerateUncoloredPattern(length, motif)
 
@@ -56,7 +58,7 @@ func TestGenerateUncoloredPattern(t *testing.T) {
 
 	t.Run("Motif that fits in the first pair of rows formats pattern correctly", func(t *testing.T) {
 		length := uint(6)
-		fitsNicely, _ := ParseKnots("///><")
+		fitsNicely, _ := bracelets.ParseKnots("///><")
 
 		result, _ := GenerateUncoloredPattern(length, fitsNicely)
 
@@ -72,7 +74,7 @@ func TestGenerateUncoloredPattern(t *testing.T) {
 
 	t.Run("Motif that takes multiple rows formats pattern correctly", func(t *testing.T) {
 		length := uint(6)
-		fitsNicely, _ := ParseKnots(`>/\<`)
+		fitsNicely, _ := bracelets.ParseKnots(`>/\<`)
 
 		result, _ := GenerateUncoloredPattern(length, fitsNicely)
 

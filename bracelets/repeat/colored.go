@@ -1,14 +1,15 @@
-package bracelets
+package repeat
 
 import (
 	"errors"
 	"fmt"
 	"strings"
 
+	"github.com/ptrgags/mindless-stitchcraft/bracelets"
 	"github.com/ptrgags/mindless-stitchcraft/stitchmath"
 )
 
-func evenRowPermutation(knots []Knot) (stitchmath.Permutation, error) {
+func evenRowPermutation(knots []bracelets.Knot) (stitchmath.Permutation, error) {
 	// Every knot involves a pair of adjacent strands. Every strand
 	// is used for even rows.
 	strandCount := 2 * len(knots)
@@ -29,7 +30,7 @@ func evenRowPermutation(knots []Knot) (stitchmath.Permutation, error) {
 	return stitchmath.MakePermutation(permutationValues)
 }
 
-func oddRowPermutation(knots []Knot) (stitchmath.Permutation, error) {
+func oddRowPermutation(knots []bracelets.Knot) (stitchmath.Permutation, error) {
 	// For odd rows, the leftmost and rightmost strands stay in place
 	// until the next row, hence the + 2
 	strandCount := 2*len(knots) + 2
@@ -57,7 +58,7 @@ func oddRowPermutation(knots []Knot) (stitchmath.Permutation, error) {
 	return stitchmath.MakePermutation(permutationValues)
 }
 
-func getPermutations(knotRows [][]Knot) ([]stitchmath.Permutation, error) {
+func getPermutations(knotRows [][]bracelets.Knot) ([]stitchmath.Permutation, error) {
 	result := make([]stitchmath.Permutation, len(knotRows))
 	for i, row := range knotRows {
 		var err error
@@ -75,13 +76,13 @@ func getPermutations(knotRows [][]Knot) ([]stitchmath.Permutation, error) {
 	return result, nil
 }
 
-func colorEvenRow(strands []uint, knots []Knot) []uint {
+func colorEvenRow(strands []uint, knots []bracelets.Knot) []uint {
 	result := make([]uint, len(knots))
 	for i, knot := range knots {
 		leftStrand := 2 * i
 		rightStrand := 2*i + 1
 
-		if knot.GetVisibleStrand() == LeftStrand {
+		if knot.GetVisibleStrand() == bracelets.LeftStrand {
 			result[i] = strands[leftStrand]
 		} else {
 			result[i] = strands[rightStrand]
@@ -90,7 +91,7 @@ func colorEvenRow(strands []uint, knots []Knot) []uint {
 	return result
 }
 
-func colorOddRow(strands []uint, knots []Knot) []uint {
+func colorOddRow(strands []uint, knots []bracelets.Knot) []uint {
 	// Include the end strands
 	n := len(knots) + 2
 	result := make([]uint, len(knots)+2)
@@ -102,7 +103,7 @@ func colorOddRow(strands []uint, knots []Knot) []uint {
 		leftStrand := 2*i + 1
 		rightStrand := 2*i + 2
 
-		if knot.GetVisibleStrand() == LeftStrand {
+		if knot.GetVisibleStrand() == bracelets.LeftStrand {
 			result[i+1] = strands[leftStrand]
 		} else {
 			result[i+1] = strands[rightStrand]
@@ -121,7 +122,7 @@ func composeAll(perms []stitchmath.Permutation) (stitchmath.Permutation, error) 
 	return product, err
 }
 
-func getColoredPattern(knotRows [][]Knot) ([][]uint, error) {
+func getColoredPattern(knotRows [][]bracelets.Knot) ([][]uint, error) {
 	inputRows := len(knotRows)
 	if inputRows == 0 {
 		return [][]uint{}, nil
@@ -224,7 +225,7 @@ func formatRows(strandLabels []rune, labeledRows [][]rune) []string {
 	return result
 }
 
-func GenerateColoredPattern(strandCount uint, motif []Knot) ([]string, error) {
+func GenerateColoredPattern(strandCount uint, motif []bracelets.Knot) ([]string, error) {
 	allLabels := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 	if int(strandCount) > len(allLabels) {
 		return []string{}, errors.New("strandCount must be at most 26")

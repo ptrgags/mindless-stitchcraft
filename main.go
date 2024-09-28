@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/ptrgags/mindless-stitchcraft/bracelets"
+	"github.com/ptrgags/mindless-stitchcraft/bracelets/repeat"
 	"github.com/ptrgags/mindless-stitchcraft/patterns"
 )
 
@@ -50,7 +51,7 @@ func bracelet(args []string) error {
 		return err
 	}
 
-	rows, err := bracelets.GenerateUncoloredPattern(uint(strandCount), motif)
+	rows, err := repeat.GenerateUncoloredPattern(uint(strandCount), motif)
 	if err != nil {
 		return err
 	}
@@ -60,7 +61,7 @@ func bracelet(args []string) error {
 		fmt.Println(row)
 	}
 
-	coloredRows, err := bracelets.GenerateColoredPattern(uint(strandCount), motif)
+	coloredRows, err := repeat.GenerateColoredPattern(uint(strandCount), motif)
 	if err != nil {
 		return err
 	}

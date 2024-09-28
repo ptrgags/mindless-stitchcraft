@@ -1,15 +1,16 @@
-package bracelets
+package repeat
 
 import (
 	"testing"
 
+	"github.com/ptrgags/mindless-stitchcraft/bracelets"
 	"github.com/ptrgags/mindless-stitchcraft/checks"
 )
 
 func TestGenerateColoredPattern(t *testing.T) {
 	t.Run("strandCount greater than alphabet length returns error", func(t *testing.T) {
 		strands := uint(28)
-		anyMotif, _ := ParseKnots("///")
+		anyMotif, _ := bracelets.ParseKnots("///")
 
 		result, err := GenerateColoredPattern(strands, anyMotif)
 
@@ -18,7 +19,7 @@ func TestGenerateColoredPattern(t *testing.T) {
 
 	t.Run("odd strandCount returns error", func(t *testing.T) {
 		strands := uint(5)
-		anyMotif, _ := ParseKnots("///")
+		anyMotif, _ := bracelets.ParseKnots("///")
 
 		result, err := GenerateColoredPattern(strands, anyMotif)
 
@@ -27,7 +28,7 @@ func TestGenerateColoredPattern(t *testing.T) {
 
 	t.Run("zero strandCount returns error", func(t *testing.T) {
 		strands := uint(0)
-		anyMotif, _ := ParseKnots("///")
+		anyMotif, _ := bracelets.ParseKnots("///")
 
 		result, err := GenerateColoredPattern(strands, anyMotif)
 
@@ -37,7 +38,7 @@ func TestGenerateColoredPattern(t *testing.T) {
 	// I was noticing that the spacing on odd rows is doubled for two strands
 	t.Run("Two strand pattern that swaps strands does not have extra spacing", func(t *testing.T) {
 		strands := uint(2)
-		motifThatSwapsStrands, _ := ParseKnots("/")
+		motifThatSwapsStrands, _ := bracelets.ParseKnots("/")
 
 		result, err := GenerateColoredPattern(strands, motifThatSwapsStrands)
 
@@ -50,7 +51,7 @@ func TestGenerateColoredPattern(t *testing.T) {
 
 	t.Run("Two strand pattern that does not swap strands does not have extra spacing", func(t *testing.T) {
 		strands := uint(2)
-		motifThatSwapsStrands, _ := ParseKnots(">")
+		motifThatSwapsStrands, _ := bracelets.ParseKnots(">")
 
 		result, err := GenerateColoredPattern(strands, motifThatSwapsStrands)
 
