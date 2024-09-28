@@ -1,4 +1,4 @@
-package patterns
+package zigzag
 
 import (
 	"fmt"
@@ -34,7 +34,7 @@ func checkShape(rows []string, expectedWidth int, expectedHeight int) error {
 	return nil
 }
 
-func TestGeneratePattern(t *testing.T) {
+func TestGenerateZigzagPattern(t *testing.T) {
 	t.Run("invalid motif returns error", func(t *testing.T) {
 		validFabricWidth := 5
 		cases := []struct {
@@ -47,7 +47,7 @@ func TestGeneratePattern(t *testing.T) {
 		}
 
 		for _, tc := range cases {
-			rows, err := GeneratePattern(tc.motif, validFabricWidth)
+			rows, err := GenerateZigzagPattern(tc.motif, validFabricWidth)
 			if err == nil || !strings.Contains(err.Error(), tc.expectedError) {
 				t.Errorf("Expected error '%v', got (%v, %v)", tc.expectedError, rows, err)
 			}
@@ -66,7 +66,7 @@ func TestGeneratePattern(t *testing.T) {
 		expectedError := "fabricWidth must be a positive integer"
 
 		for _, tc := range cases {
-			rows, err := GeneratePattern(validMotif, tc.fabricWidth)
+			rows, err := GenerateZigzagPattern(validMotif, tc.fabricWidth)
 			if err == nil || !strings.Contains(err.Error(), expectedError) {
 				t.Errorf("Expected error '%v', got (%v, %v)", expectedError, rows, err)
 			}
@@ -93,7 +93,7 @@ func TestGeneratePattern(t *testing.T) {
 		}
 
 		for _, tc := range cases {
-			rows, err := GeneratePattern(tc.motif, tc.fabricWidth)
+			rows, err := GenerateZigzagPattern(tc.motif, tc.fabricWidth)
 			if err != nil {
 				t.Errorf("Expected no errors, got (%v, %v)", rows, err)
 			}
@@ -129,7 +129,7 @@ func TestGeneratePattern(t *testing.T) {
 		}
 
 		for _, tc := range cases {
-			rows, err := GeneratePattern(tc.motif, tc.fabricWidth)
+			rows, err := GenerateZigzagPattern(tc.motif, tc.fabricWidth)
 			if err != nil {
 				t.Errorf("Expected no errors, got (%v, %v)", rows, err)
 			}
@@ -176,7 +176,7 @@ func TestGeneratePattern(t *testing.T) {
 			}},
 		}
 		for _, tc := range cases {
-			rows, err := GeneratePattern(tc.motif, tc.fabricWidth)
+			rows, err := GenerateZigzagPattern(tc.motif, tc.fabricWidth)
 			if err != nil {
 				t.Errorf("Expected no errors, got (%v, %v)", rows, err)
 			}
@@ -234,7 +234,7 @@ func TestGeneratePattern(t *testing.T) {
 		}
 
 		for _, tc := range cases {
-			rows, err := GeneratePattern(tc.motif, tc.fabricWidth)
+			rows, err := GenerateZigzagPattern(tc.motif, tc.fabricWidth)
 			if err != nil {
 				t.Errorf("Expected no errors, got (%v, %v)", rows, err)
 			}

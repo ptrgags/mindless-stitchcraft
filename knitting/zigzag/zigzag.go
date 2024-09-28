@@ -1,4 +1,4 @@
-package patterns
+package zigzag
 
 import (
 	"errors"
@@ -134,7 +134,7 @@ func handleReverseRows(rows []string) []string {
 	return result
 }
 
-func GeneratePattern(motif string, fabricWidth int) ([]string, error) {
+func GenerateZigzagPattern(motif string, fabricWidth int) ([]string, error) {
 	if err := validateMotif(motif); err != nil {
 		return nil, err
 	}
