@@ -36,6 +36,8 @@ func formatOddRow(knots []bracelets.Knot) string {
 	return fmt.Sprintf(" %s ", formatEvenRow(knots))
 }
 
+// Helper function that takes a number of friendship bracelet strands, a motif of knots, and
+// repeats the motif over and over until the motif ends at the end of a pair of rows.
 func GenerateUncoloredKnots(strandCount uint, motif []bracelets.Knot) ([][]bracelets.Knot, error) {
 	if strandCount == 0 {
 		return [][]bracelets.Knot{}, errors.New("strandCount must be at least 2")
@@ -73,6 +75,14 @@ func GenerateUncoloredKnots(strandCount uint, motif []bracelets.Knot) ([][]brace
 	return result, nil
 }
 
+// Repeat a motif of knots repeat it until it
+// This formats the pattern with slashes. E.g. a row of forward knots and
+// a row of backward knots would look like:
+//
+//	[]string{
+//	  "\ \ \"
+//	  " / / "
+//	}
 func GenerateUncoloredPattern(strandCount uint, motif []bracelets.Knot) ([]string, error) {
 	knotRows, err := GenerateUncoloredKnots(strandCount, motif)
 	if err != nil {
