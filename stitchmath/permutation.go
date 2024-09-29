@@ -9,16 +9,6 @@ type Permutation struct {
 	values []uint
 }
 
-func (p Permutation) ElementCount() int {
-	return len(p.values)
-}
-
-func (p Permutation) GetValues() []uint {
-	clone := make([]uint, len(p.values))
-	copy(clone, p.values)
-	return clone
-}
-
 func MakeIdentity(length int) Permutation {
 	values := make([]uint, length)
 	for i := 0; i < length; i++ {
@@ -49,42 +39,22 @@ func MakePermutation(values []uint) (Permutation, error) {
 	return Permutation{values}, nil
 }
 
-func Apply(perm Permutation, value uint) uint {
+func (p Permutation) ElementCount() int {
+	return len(p.values)
+}
+
+func (p Permutation) GetValues() []uint {
+	clone := make([]uint, len(p.values))
+	copy(clone, p.values)
+	return clone
+}
+
+func (perm Permutation) Apply(value uint) uint {
 	if value > uint(len(perm.values)) {
 		return value
 	}
 
 	return perm.values[value]
-}
-
-func Compose(a Permutation, b Permutation) (Permutation, error) {
-	n := len(a.values)
-	if n != len(b.values) {
-		return Permutation{}, errors.New("permutations must have the same length")
-	}
-
-	resultValues := make([]uint, n)
-	for i := 0; i < n; i++ {
-		afterB := b.values[i]
-		afterA := a.values[afterB]
-		resultValues[i] = afterA
-	}
-
-	return Permutation{resultValues}, nil
-}
-
-func Equals(a Permutation, b Permutation) bool {
-	if len(a.values) != len(b.values) {
-		return false
-	}
-
-	for i := range a.values {
-		if a.values[i] != b.values[i] {
-			return false
-		}
-	}
-
-	return true
 }
 
 func gcd(a uint, b uint) uint {
@@ -126,7 +96,7 @@ func findCycle(values []uint, start_index int, visited []bool) []uint {
 
 }
 
-func CycleDecomposition(perm Permutation) [][]uint {
+func (perm Permutation) CycleDecomposition() [][]uint {
 	n := len(perm.values)
 
 	// The length will be at most n for an identity permutation, and otherwise
@@ -148,8 +118,8 @@ func CycleDecomposition(perm Permutation) [][]uint {
 	return result
 }
 
-func Order(perm Permutation) uint {
-	cycles := CycleDecomposition(perm)
+func (perm Permutation) Order() uint {
+	cycles := perm.CycleDecomposition()
 
 	order := uint(1)
 	for _, cycle := range cycles {
@@ -158,4 +128,34 @@ func Order(perm Permutation) uint {
 	}
 
 	return order
+}
+
+func Compose(a Permutation, b Permutation) (Permutation, error) {
+	n := len(a.values)
+	if n != len(b.values) {
+		return Permutation{}, errors.New("permutations must have the same length")
+	}
+
+	resultValues := make([]uint, n)
+	for i := 0; i < n; i++ {
+		afterB := b.values[i]
+		afterA := a.values[afterB]
+		resultValues[i] = afterA
+	}
+
+	return Permutation{resultValues}, nil
+}
+
+func Equals(a Permutation, b Permutation) bool {
+	if len(a.values) != len(b.values) {
+		return false
+	}
+
+	for i := range a.values {
+		if a.values[i] != b.values[i] {
+			return false
+		}
+	}
+
+	return true
 }

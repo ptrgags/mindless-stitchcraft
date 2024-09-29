@@ -141,7 +141,7 @@ func getColoredPattern(knotRows [][]bracelets.Knot) ([][]uint, error) {
 		return [][]uint{}, err
 	}
 
-	patternRepeats := stitchmath.Order(product)
+	patternRepeats := product.Order()
 	resultRowCount := int(patternRepeats) * inputRows
 
 	n := permutations[0].ElementCount()

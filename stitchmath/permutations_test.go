@@ -2,18 +2,16 @@ package stitchmath
 
 import (
 	"fmt"
-	"strings"
 	"testing"
+
+	"github.com/ptrgags/mindless-stitchcraft/checks"
 )
 
 func TestMakePermutation(t *testing.T) {
 	t.Run("Zero length permutation returns error", func(t *testing.T) {
 		perm, err := MakePermutation([]uint{})
 
-		expectedError := "must have at least one entry"
-		if err == nil || !strings.Contains(err.Error(), expectedError) {
-			t.Errorf("Expected error '%v', got (%v, %v)", expectedError, perm, err)
-		}
+		checks.CheckHasError(t, perm, err, "must have at least one entry")
 	})
 
 	t.Run("Out-of-bounds entry results in error", func(t *testing.T) {
@@ -21,10 +19,7 @@ func TestMakePermutation(t *testing.T) {
 
 		perm, err := MakePermutation(values)
 
-		expectedError := "values must be in the range [0, 3]"
-		if err == nil || !strings.Contains(err.Error(), expectedError) {
-			t.Errorf("Expected error '%v', got (%v, %v)", expectedError, perm, err)
-		}
+		checks.CheckHasError(t, perm, err, "values must be in the range [0, 3]")
 	})
 
 	t.Run("duplicate entry results in error", func(t *testing.T) {
@@ -32,10 +27,7 @@ func TestMakePermutation(t *testing.T) {
 
 		perm, err := MakePermutation(values)
 
-		expectedError := "each entry must be listed exactly once"
-		if err == nil || !strings.Contains(err.Error(), expectedError) {
-			t.Errorf("Expected error '%v', got (%v, %v)", expectedError, perm, err)
-		}
+		checks.CheckHasError(t, perm, err, "each entry must be listed exactly once")
 	})
 
 	t.Run("Valid permutation does not produce error", func(t *testing.T) {
@@ -43,8 +35,19 @@ func TestMakePermutation(t *testing.T) {
 
 		perm, err := MakePermutation(values)
 
-		if err != nil {
-			t.Errorf("Expected valid permutation, got (%v, %v)", perm, err)
+		checks.CheckHasNoError(t, perm, err)
+	})
+}
+
+func TestElementCount(t *testing.T) {
+	t.Run("Computes the number of elements", func(t *testing.T) {
+		perm, _ := MakePermutation([]uint{0, 3, 2, 4, 1})
+
+		result := perm.ElementCount()
+
+		expectedLength := 5
+		if result != expectedLength {
+			t.Errorf("Expected %d, got %v", expectedLength, result)
 		}
 	})
 }
@@ -54,7 +57,7 @@ func TestApplyPermutation(t *testing.T) {
 		perm, _ := MakePermutation([]uint{0, 2, 1, 3})
 		var outOfRange uint = 6
 
-		result := Apply(perm, outOfRange)
+		result := perm.Apply(outOfRange)
 
 		if result != outOfRange {
 			t.Errorf("Expected %v, got %v", outOfRange, result)
@@ -65,7 +68,7 @@ func TestApplyPermutation(t *testing.T) {
 		perm, _ := MakePermutation([]uint{0, 2, 1, 3})
 		var shouldBeScrambled uint = 1
 
-		result := Apply(perm, shouldBeScrambled)
+		result := perm.Apply(shouldBeScrambled)
 
 		var expected uint = 2
 		if result != expected {
@@ -79,7 +82,7 @@ func TestApplyPermutation(t *testing.T) {
 		perm, _ := MakePermutation([]uint{0, 2, 1, 3})
 		var shouldBeFixed uint = 3
 
-		result := Apply(perm, shouldBeFixed)
+		result := perm.Apply(shouldBeFixed)
 
 		if result != shouldBeFixed {
 			t.Errorf("Expected %v, got %v", shouldBeFixed, result)
@@ -94,10 +97,7 @@ func TestComposePermutations(t *testing.T) {
 
 		result, err := Compose(perm4, perm3)
 
-		expectedError := "permutations must have the same length"
-		if err == nil || !strings.Contains(err.Error(), expectedError) {
-			t.Errorf("Expected error '%v', got (%v, %v)", expectedError, result, err)
-		}
+		checks.CheckHasError(t, result, err, "permutations must have the same length")
 	})
 
 	t.Run("composing valid permutations do not produce error", func(t *testing.T) {
@@ -106,9 +106,7 @@ func TestComposePermutations(t *testing.T) {
 
 		result, err := Compose(permA, permB)
 
-		if err != nil {
-			t.Errorf("Expected no error, got (%v, %v)", result, err)
-		}
+		checks.CheckHasNoError(t, result, err)
 	})
 
 	t.Run("permutations are composed from right to left", func(t *testing.T) {
@@ -190,7 +188,7 @@ func TestPermutationCycleDecomposition(t *testing.T) {
 	t.Run("Identity permutation returns each element as 1-cycles", func(t *testing.T) {
 		identity, _ := MakePermutation([]uint{0, 1, 2, 3, 4})
 
-		result := CycleDecomposition(identity)
+		result := identity.CycleDecomposition()
 
 		expectedRows := [][]uint{
 			{0},
@@ -208,7 +206,7 @@ func TestPermutationCycleDecomposition(t *testing.T) {
 	t.Run("Involution has one pair and the rest 1-cycles", func(t *testing.T) {
 		involution, _ := MakePermutation([]uint{1, 0, 2, 3})
 
-		result := CycleDecomposition(involution)
+		result := involution.CycleDecomposition()
 
 		expectedCycles := [][]uint{
 			{0, 1},
@@ -224,7 +222,7 @@ func TestPermutationCycleDecomposition(t *testing.T) {
 	t.Run("Cycle through all elements returns a single cycle", func(t *testing.T) {
 		cycleBackwards, _ := MakePermutation([]uint{3, 0, 1, 2})
 
-		result := CycleDecomposition(cycleBackwards)
+		result := cycleBackwards.CycleDecomposition()
 
 		expectedCycles := [][]uint{
 			{0, 3, 2, 1},
@@ -238,7 +236,7 @@ func TestPermutationCycleDecomposition(t *testing.T) {
 	t.Run("Multiple cycles are deinterleaved", func(t *testing.T) {
 		multipleCycles, _ := MakePermutation([]uint{2, 5, 4, 1, 0, 3})
 
-		result := CycleDecomposition(multipleCycles)
+		result := multipleCycles.CycleDecomposition()
 
 		expectedCycles := [][]uint{
 			{0, 2, 4},
@@ -256,7 +254,7 @@ func TestPermutationOrder(t *testing.T) {
 		// |1| = 1
 		identity, _ := MakePermutation([]uint{0, 1, 2, 3, 4})
 
-		order := Order(identity)
+		order := identity.Order()
 
 		var expectedOrder uint = 1
 		if order != expectedOrder {
@@ -268,7 +266,7 @@ func TestPermutationOrder(t *testing.T) {
 		// |(1 2)| = 2
 		swap, _ := MakePermutation([]uint{0, 2, 1, 3, 4})
 
-		order := Order(swap)
+		order := swap.Order()
 
 		var expectedOrder uint = 2
 		if order != expectedOrder {
@@ -280,7 +278,7 @@ func TestPermutationOrder(t *testing.T) {
 		// |(1 2 3)| = 3
 		cycle, _ := MakePermutation([]uint{0, 2, 3, 1, 4})
 
-		order := Order(cycle)
+		order := cycle.Order()
 
 		var expectedOrder uint = 3
 		if order != expectedOrder {
@@ -294,7 +292,7 @@ func TestPermutationOrder(t *testing.T) {
 		// |(0 3)(1 2)| = 2
 		twoSwaps, _ := MakePermutation([]uint{3, 2, 1, 0, 4})
 
-		order := Order(twoSwaps)
+		order := twoSwaps.Order()
 
 		var expectedOrder uint = 2
 		if order != expectedOrder {
@@ -306,7 +304,7 @@ func TestPermutationOrder(t *testing.T) {
 		// |(0 1)(2 3 4)(5 6 7 8)| = lcm(2, 3, 4) = lcm(6, 4) = 12
 		twoSwaps, _ := MakePermutation([]uint{1, 0, 3, 4, 2, 6, 7, 8, 5})
 
-		order := Order(twoSwaps)
+		order := twoSwaps.Order()
 
 		var expectedOrder uint = 12
 		if order != expectedOrder {
