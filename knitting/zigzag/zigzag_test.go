@@ -1,38 +1,10 @@
 package zigzag
 
 import (
-	"fmt"
-	"strings"
 	"testing"
+
+	"github.com/ptrgags/mindless-stitchcraft/checks"
 )
-
-func checkRowsEqual(actual []string, expected []string) error {
-	if len(actual) != len(expected) {
-		return fmt.Errorf("Lengths don't match: len(actual)=%v, len(expected)=%v, actual=%v, expected=%v", len(actual), len(expected), actual, expected)
-	}
-
-	for i, actualRow := range actual {
-		if actualRow != expected[i] {
-			return fmt.Errorf("Row mismatch at position %d: %v, %v actual=%v, expected=%v", i, actualRow, expected[i], actual, expected)
-		}
-	}
-
-	return nil
-}
-
-func checkShape(rows []string, expectedWidth int, expectedHeight int) error {
-	if len(rows) != expectedHeight {
-		return fmt.Errorf("Incorrect number of rows. Expected %v, got %v, rows=%v", expectedHeight, len(rows), rows)
-	}
-
-	for _, row := range rows {
-		if len(row) != expectedWidth {
-			return fmt.Errorf("Incorrect number of cols. Expected %v, got %v. rows=%v", expectedWidth, len(rows), rows)
-		}
-	}
-
-	return nil
-}
 
 func TestGenerateZigzagPattern(t *testing.T) {
 	t.Run("invalid motif returns error", func(t *testing.T) {
@@ -47,10 +19,11 @@ func TestGenerateZigzagPattern(t *testing.T) {
 		}
 
 		for _, tc := range cases {
-			rows, err := GenerateZigzagPattern(tc.motif, validFabricWidth)
-			if err == nil || !strings.Contains(err.Error(), tc.expectedError) {
-				t.Errorf("Expected error '%v', got (%v, %v)", tc.expectedError, rows, err)
-			}
+			t.Run(tc.label, func(t *testing.T) {
+				rows, err := GenerateZigzagPattern(tc.motif, validFabricWidth)
+
+				checks.CheckHasError(t, rows, err, tc.expectedError)
+			})
 		}
 	})
 
@@ -63,13 +36,13 @@ func TestGenerateZigzagPattern(t *testing.T) {
 			{"zero", 0},
 			{"negative", -1},
 		}
-		expectedError := "fabricWidth must be a positive integer"
 
 		for _, tc := range cases {
-			rows, err := GenerateZigzagPattern(validMotif, tc.fabricWidth)
-			if err == nil || !strings.Contains(err.Error(), expectedError) {
-				t.Errorf("Expected error '%v', got (%v, %v)", expectedError, rows, err)
-			}
+			t.Run(tc.label, func(t *testing.T) {
+				rows, err := GenerateZigzagPattern(validMotif, tc.fabricWidth)
+
+				checks.CheckHasError(t, rows, err, "fabricWidth must be a positive integer")
+			})
 		}
 	})
 
@@ -93,15 +66,12 @@ func TestGenerateZigzagPattern(t *testing.T) {
 		}
 
 		for _, tc := range cases {
-			rows, err := GenerateZigzagPattern(tc.motif, tc.fabricWidth)
-			if err != nil {
-				t.Errorf("Expected no errors, got (%v, %v)", rows, err)
-			}
+			t.Run(tc.label, func(t *testing.T) {
+				rows, err := GenerateZigzagPattern(tc.motif, tc.fabricWidth)
 
-			shapeErr := checkShape(rows, tc.fabricWidth, tc.expectedHeight)
-			if shapeErr != nil {
-				t.Errorf("%v: %v", tc.label, shapeErr.Error())
-			}
+				checks.CheckHasNoError(t, rows, err)
+				checks.CheckStringGridShape(t, rows, tc.fabricWidth, tc.expectedHeight)
+			})
 		}
 	})
 
@@ -129,15 +99,12 @@ func TestGenerateZigzagPattern(t *testing.T) {
 		}
 
 		for _, tc := range cases {
-			rows, err := GenerateZigzagPattern(tc.motif, tc.fabricWidth)
-			if err != nil {
-				t.Errorf("Expected no errors, got (%v, %v)", rows, err)
-			}
+			t.Run(tc.label, func(t *testing.T) {
+				rows, err := GenerateZigzagPattern(tc.motif, tc.fabricWidth)
 
-			shapeErr := checkShape(rows, tc.fabricWidth, tc.expectedHeight)
-			if shapeErr != nil {
-				t.Errorf("%v: %v", tc.label, shapeErr.Error())
-			}
+				checks.CheckHasNoError(t, rows, err)
+				checks.CheckStringGridShape(t, rows, tc.fabricWidth, tc.expectedHeight)
+			})
 		}
 	})
 
@@ -176,15 +143,12 @@ func TestGenerateZigzagPattern(t *testing.T) {
 			}},
 		}
 		for _, tc := range cases {
-			rows, err := GenerateZigzagPattern(tc.motif, tc.fabricWidth)
-			if err != nil {
-				t.Errorf("Expected no errors, got (%v, %v)", rows, err)
-			}
+			t.Run(tc.label, func(t *testing.T) {
+				rows, err := GenerateZigzagPattern(tc.motif, tc.fabricWidth)
 
-			equalsErr := checkRowsEqual(rows, tc.expectedRows)
-			if equalsErr != nil {
-				t.Errorf("%v: %v", tc.label, equalsErr.Error())
-			}
+				checks.CheckHasNoError(t, rows, err)
+				checks.CheckStringGridsEqual(t, rows, tc.expectedRows)
+			})
 		}
 	})
 
@@ -234,15 +198,12 @@ func TestGenerateZigzagPattern(t *testing.T) {
 		}
 
 		for _, tc := range cases {
-			rows, err := GenerateZigzagPattern(tc.motif, tc.fabricWidth)
-			if err != nil {
-				t.Errorf("Expected no errors, got (%v, %v)", rows, err)
-			}
+			t.Run(tc.label, func(t *testing.T) {
+				rows, err := GenerateZigzagPattern(tc.motif, tc.fabricWidth)
 
-			equalsErr := checkRowsEqual(rows, tc.expectedRows)
-			if equalsErr != nil {
-				t.Errorf("%v: %v", tc.label, equalsErr.Error())
-			}
+				checks.CheckHasNoError(t, rows, err)
+				checks.CheckStringGridsEqual(t, rows, tc.expectedRows)
+			})
 		}
 	})
 }
