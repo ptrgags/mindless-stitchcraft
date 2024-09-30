@@ -8,6 +8,7 @@ import (
 
 	"github.com/ptrgags/mindless-stitchcraft/bracelets"
 	"github.com/ptrgags/mindless-stitchcraft/bracelets/repeat"
+	"github.com/ptrgags/mindless-stitchcraft/knitting/sync"
 	"github.com/ptrgags/mindless-stitchcraft/knitting/zigzag"
 )
 
@@ -24,6 +25,31 @@ func knitZigzag(args []string) error {
 	motif := args[1]
 
 	rows, err := zigzag.GenerateZigzagPattern(motif, fabricWidth)
+
+	if err != nil {
+		return err
+	}
+
+	for _, row := range rows {
+		fmt.Println(row)
+	}
+
+	return nil
+}
+
+func knitSync(args []string) error {
+	if len(args) < 2 {
+		return errors.New("usage: main.go knit-sync FABRIC_WIDTH MOTIF [MOTIF, ...]")
+	}
+
+	fabricWidth, err := strconv.Atoi(args[0])
+	if err != nil {
+		return err
+	}
+
+	motifs := args[1:]
+
+	rows, err := sync.GeneratePattern(fabricWidth, motifs)
 
 	if err != nil {
 		return err
@@ -73,7 +99,7 @@ func bracelet(args []string) error {
 }
 
 func main() {
-	const usage = "usage: main.go {knit-zigzag,bracelet-repeat} ARGS"
+	const usage = "usage: main.go {knit-zigzag,knit-sync,bracelet-repeat} ARGS"
 
 	if len(os.Args) < 2 {
 		fmt.Println(usage)
@@ -84,6 +110,8 @@ func main() {
 	switch os.Args[1] {
 	case "knit-zigzag":
 		err = knitZigzag(os.Args[2:])
+	case "knit-sync":
+		err = knitSync(os.Args[2:])
 	case "bracelet-repeat":
 		err = bracelet(os.Args[2:])
 	default:

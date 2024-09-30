@@ -2,24 +2,10 @@ package zigzag
 
 import (
 	"errors"
-	"slices"
 	"strings"
+
+	"github.com/ptrgags/mindless-stitchcraft/knitting"
 )
-
-// Check that a motif is nonempty and is composed of 'v' and '-' runes.
-func validateMotif(motif string) error {
-	if len(motif) == 0 {
-		return errors.New("motif must not be empty")
-	}
-
-	for _, r := range motif {
-		if r != 'v' && r != '-' {
-			return errors.New("motif has invalid characters. It must be a string of knits ('v') and purls ('-')")
-		}
-	}
-
-	return nil
-}
 
 // Given a row of the fabric with a fixed width, fill it with copies of motif
 // plus a substring that went past the end of the last row by overhang stitches.
@@ -89,28 +75,6 @@ func ensureEvenRowCount(rows []string) []string {
 	return result
 }
 
-// Take a string of stiches (either 'v' for knit or '-' for purl)
-// and swap the knits and purls. This is one part of what happens when
-// you flip the fabric over when knitting. This returns a new string
-func swapKnitsAndPurls(stitches string) string {
-	return strings.Map(func(r rune) rune {
-		if r == 'v' {
-			return '-'
-		} else if r == '-' {
-			return 'v'
-		}
-
-		return r
-	}, stitches)
-}
-
-// Reverse a string.
-func reverse(s string) string {
-	result := []rune(s)
-	slices.Reverse(result)
-	return string(result)
-}
-
 // pass in rows of the fabric listed as knit ('v') and purl ('-') as the
 // knitter
 //
@@ -127,7 +91,7 @@ func handleReverseRows(rows []string) []string {
 		if i%2 == 0 {
 			result[i] = row
 		} else {
-			result[i] = swapKnitsAndPurls(reverse(row))
+			result[i] = knitting.SwapKnitsAndPurls(knitting.ReverseRow(row))
 		}
 	}
 
@@ -135,7 +99,7 @@ func handleReverseRows(rows []string) []string {
 }
 
 func GenerateZigzagPattern(motif string, fabricWidth int) ([]string, error) {
-	if err := validateMotif(motif); err != nil {
+	if err := knitting.ValidateMotif(motif); err != nil {
 		return nil, err
 	}
 
@@ -146,17 +110,7 @@ func GenerateZigzagPattern(motif string, fabricWidth int) ([]string, error) {
 	rows := generateRawPattern(motif, fabricWidth)
 	rows = ensureEvenRowCount(rows)
 	rows = handleReverseRows(rows)
-	rows = rotate180(rows)
+	rows = knitting.Rotate180(rows)
 
 	return rows, nil
-}
-
-func rotate180(rows []string) []string {
-	n := len(rows)
-	rotated := make([]string, n)
-	for i, row := range rows {
-		rotated[n-1-i] = reverse(row)
-	}
-
-	return rotated
 }
