@@ -7,6 +7,32 @@ import (
 	"github.com/ptrgags/mindless-stitchcraft/checks"
 )
 
+func checkArraysEqual(t *testing.T, actual []uint, expected []uint) {
+	if len(actual) != len(expected) {
+		t.Errorf("Lengths don't match: len(actual)=%v, len(expected)=%v, actual=%v, expected=%v", len(actual), len(expected), actual, expected)
+	}
+
+	for i, actualRow := range actual {
+		if actualRow != expected[i] {
+			t.Errorf("Row mismatch at position %d: %v, %v actual=%v, expected=%v", i, actualRow, expected[i], actual, expected)
+		}
+	}
+}
+
+func checkArraysNotEqual(t *testing.T, actual []uint, expected []uint) {
+	if len(actual) != len(expected) {
+		return
+	}
+
+	for i, actualRow := range actual {
+		if actualRow != expected[i] {
+			return
+		}
+	}
+
+	t.Errorf("Arrays were expected to be different, but were the same: %v", actual)
+}
+
 func TestMakePermutation(t *testing.T) {
 	t.Run("Zero length permutation returns error", func(t *testing.T) {
 		perm, err := MakePermutation([]uint{})
@@ -49,6 +75,27 @@ func TestElementCount(t *testing.T) {
 		if result != expectedLength {
 			t.Errorf("Expected %d, got %v", expectedLength, result)
 		}
+	})
+}
+
+func TestGetValues(t *testing.T) {
+	t.Run("Gets the underlying values", func(t *testing.T) {
+		values := []uint{0, 3, 2, 4, 1}
+		perm, _ := MakePermutation(values)
+
+		result := perm.GetValues()
+
+		checkArraysEqual(t, result, values)
+	})
+
+	t.Run("Return value is a copy of the values", func(t *testing.T) {
+		perm, _ := MakePermutation([]uint{0, 3, 2, 4, 1})
+
+		modified := perm.GetValues()
+		modified[0] = 10
+		another := perm.GetValues()
+
+		checkArraysNotEqual(t, modified, another)
 	})
 }
 
