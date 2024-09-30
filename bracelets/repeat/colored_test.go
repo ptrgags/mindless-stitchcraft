@@ -26,6 +26,15 @@ func TestGenerateColoredPattern(t *testing.T) {
 		checks.CheckHasError(t, result, err, "strandCount must be at least 2")
 	})
 
+	t.Run("Empty motif returns error", func(t *testing.T) {
+		strands := []rune("ABCD")
+		emptyMotif := []bracelets.Knot{}
+
+		result, err := GenerateColoredPattern(strands, emptyMotif)
+
+		checks.CheckHasError(t, result, err, "motif must have at least one knot")
+	})
+
 	// I was noticing that the spacing on odd rows is doubled for two strands
 	t.Run("Two strand pattern that swaps strands does not have extra spacing", func(t *testing.T) {
 		strands := []rune("AB")
@@ -163,11 +172,32 @@ func TestGenerateColoredPattern(t *testing.T) {
 		checks.CheckStringGridsEqual(t, result, expectedPattern)
 	})
 
+	t.Run("Motif shorter than 2 rows produces the correct pattern", func(t *testing.T) {
+		strands := []rune("ABCD")
+		motif, _ := bracelets.ParseKnots("><")
+
+		result, err := GenerateColoredPattern(strands, motif)
+
+		expectedPattern := []string{
+			"A B C D",
+			"| | | |",
+			" A   D ", // > <
+			"A  B  D", //  >
+			" B   C ", // < >
+			"A  C  D", //  <
+			"| | | |",
+			"A B C D",
+		}
+		checks.CheckHasNoError(t, result, err)
+		checks.CheckStringGridsEqual(t, result, expectedPattern)
+	})
+
 	t.Run("motif longer than 2 rows produces the correct pattern", func(t *testing.T) {
 		strands := []rune("ABCD")
 		motif, _ := bracelets.ParseKnots(`///\`)
 
 		result, err := GenerateColoredPattern(strands, motif)
+
 		expectedPattern := []string{
 			"A B C D",
 			"| | | |",
@@ -191,6 +221,7 @@ func TestGenerateColoredPattern(t *testing.T) {
 		motif, _ := bracelets.ParseKnots(`<>/\`)
 
 		result, err := GenerateColoredPattern(strands, motif)
+
 		expectedPattern := []string{
 			"A B C D",
 			"| | | |",
@@ -215,6 +246,7 @@ func TestGenerateColoredPattern(t *testing.T) {
 		motif, _ := bracelets.ParseKnots(`//<`)
 
 		result, err := GenerateColoredPattern(strands, motif)
+
 		expectedPattern := []string{
 			"A A B B",
 			"| | | |", //  to show what's going on with 4 unique strands:
@@ -229,11 +261,12 @@ func TestGenerateColoredPattern(t *testing.T) {
 		checks.CheckStringGridsEqual(t, result, expectedPattern)
 	})
 
-	t.Run("Pattern with only F/B and B/F knots produces a short pattern", func(t *testing.T) {
+	t.Run("Pattern with only ForwardBackward and BackwardForward knots produces a short pattern", func(t *testing.T) {
 		strands := []rune("ABCDEF")
 		motif, _ := bracelets.ParseKnots(`>>><<`)
 
 		result, err := GenerateColoredPattern(strands, motif)
+
 		expectedPattern := []string{
 			"A B C D E F",
 			"| | | | | |",

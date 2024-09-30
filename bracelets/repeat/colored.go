@@ -1,6 +1,7 @@
 package repeat
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -245,6 +246,10 @@ func formatRows(strandLabels []rune, labeledRows [][]rune) []string {
 // motif is the list of knots to repeat. See bracelets.ParseKnots
 func GenerateColoredPattern(strandLabels []rune, motif []bracelets.Knot) ([]string, error) {
 	strandCount := uint(len(strandLabels))
+
+	if len(motif) == 0 {
+		return []string{}, errors.New("motif must have at least one knot")
+	}
 
 	knotRows, err := GenerateUncoloredKnots(strandCount, motif)
 	if err != nil {
