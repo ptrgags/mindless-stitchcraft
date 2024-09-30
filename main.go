@@ -38,7 +38,7 @@ func knitZigzag(args []string) error {
 
 func bracelet(args []string) error {
 	if len(args) < 2 {
-		return errors.New("usage: main.go bracelet-repeat STRANDS MOTIF")
+		return errors.New("usage: main.go bracelet-repeat STRAND_LABELS MOTIF")
 	}
 
 	strandLabels := []rune(args[0])

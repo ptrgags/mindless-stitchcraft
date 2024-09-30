@@ -1,7 +1,23 @@
 # Mindless Stitchcraft (2024)
 
-I like to knit, crochet, cross-stitch, make friendship bracelets/macrame as
-its
+I like to knit, crochet, cross-stitch, make friendship bracelets/macrame,
+etc. These are relaxing hands-on activities.
+
+I prefer patterns that are simple to remember yet look visually interesting.
+Surprisingly, you can do a lot with patterns that involve the same motif
+of stitches over and over (e.g. "knit 2, purl 3") depending on the 
+fabric width and other factors.
+
+This program lets me explore and preview patterns before putting them to 
+fabric. This way I can rule out patterns that would be too long to
+remember easily, or uninspiring designs.
+
+This repo also is a way for me to practice some things I've learned about
+recently:
+
+- Golang
+- Unit testing
+- Docker
 
 ## Docker
 
@@ -25,7 +41,7 @@ docker image build -f docker/Dockerfile -t ptrgags/mindless-stitchcraft .
 
 ## Running Manually
 
-If you don't want to use Docker, you can use these steps:
+If you don't want to use Docker and have Golang installed, you can run
 
 ```
 go run . COMMAND <ARGS>
@@ -58,6 +74,8 @@ main page and other videos about the technique (see
 example) I got a rough understanding of the technique. I began exploring the
 math on my own. I think this pattern corresponds to the "serpentine" method.
 
+Usage:
+
 ```
 mindless-stitchcraft knit-zigzag FABRIC_WIDTH MOTIF
 ```
@@ -74,7 +92,7 @@ bottom right and zigzag.
 
 Examples:
 
-This first one has a motif that repeats many times
+This first example has a motif that repeats many times:
 
 ```
 mindless-stitchcraft 10 "v--"
@@ -89,7 +107,8 @@ v--v--v--v # <-- first row is stitched from right to left
 ```
 
 Changing the fabric width can result in a very different pattern. E.g. here's
-a motif that lines up with 
+a motif of length 3 that evenly divides 9. This pattern repeats after only
+2 rows!
 
 ```
 mindless-stitchcraft 9 "v--"
@@ -98,33 +117,34 @@ mindless-stitchcraft 9 "v--"
 --v--v--v
 ```
 
-#### Zigzag Math
-
-Some details for the mathematically inclined:
-
-- Let $w$ be the given fabric width
-- Let $m$ be the length of the motif in stitches
-- Let's temporarily ignore the zig-zag nature of flat knitting. Assume every row
-is knit in the same direction for now.
-- The pattern will repeat after $h$ rows. This means the pattern will be
-short when the motif evenly divides the fabric width (or vice-versa). And when
-the two lengths are coprime, there are exactly $m$ rows.
-
-$$h=\frac{m}{\text{gcd}(m, w)}$$
-
-- Interestingly, the area is the least common multiple of the two lengths.
-
-$$A=\frac{wm}{\text{gcd}(m, w)} = \text{lcm}(m, w)$$
-
-- As for the number of motif repeats, divide $\frac{a}{m}$ and get:
-
-$$\frac{w}{\text{gcd}(m,w)}$$
-
-- Now, let's account for the zig-zag stitching order. In general, the stitches
-on the front will look different on the back due to swapping knits and purls.
-So this means we have to _double_ the number of rows/area/motif repeats.
-
 ### Friendship Bracelets: Repeat
+
+I took the concept of repeating a motif and applied it to friendship
+bracelets. 
+
+Friendship bracelets take parallel strands of embroidery floss and
+tie pairs of strands together in staggered rows like this:
+
+```
+x x x x
+ x x x
+x x x x
+ x x x
+```
+
+Taking a motif of knots `/ > \`, we can fit them into the
+slots from left to right like this:
+
+```
+/ > \ /
+ > \ /
+> \ / >
+ \ / >
+\ / > \
+ / > \
+```
+
+Usage:
 
 ```
 mindless-stitchcraft knit-zigzag STRAND_COUNT MOTIF
@@ -134,8 +154,13 @@ Where:
 
 | Argument | Description |
 | --- | --- |
-| `STRAND_COUNT` | The number of strands in the friendship bracelet |
+| `STRAND_LABELS` | A string of Unicode characters that represents the colors of each strand. E.g. `ABCD` represents 4 strands labeled A, B, C, D. Labels can be repeated (e.g. `ABCCBA`) to indicate multiple strands of the same color |
 | `MOTIF` | A string of knots (see below) that represents the pattern |
+
+To make a short pattern, have the length of a motif divide the length of
+two rows of knots. Since strands are knotted in pairs and every other row
+is staggered, this means the motif should be $\text{len(STRANDS)} - 1$
+for the shortest patterns. That said, any non-zero length will work!
 
 Knots (and some useful properties of each one)
 
@@ -145,3 +170,70 @@ Knots (and some useful properties of each one)
 |  `/`   | Backward knot | Right strand | Yes |
 |  `>`   | Forward-backward knot | Left strand | No |
 |  `<`   | Backward-forward knot | Right strand | No |
+
+
+
+The output is two versions of the pattern. The uncolored pattern lists the knots you make, while the colored pattern gives a preview of what
+the result will look like.
+
+Example: the classic chevron pattern:
+
+```
+mindless-stitchcraft bracelet-repeat '.ahBBha.' '\\//\//'
+
+Uncolored pattern:
+\ \ / /
+ \ / / 
+Colored pattern:
+. a h B B h a .
+| | | | | | | |
+ .   h   h   . 
+a  .   h   .  a
+ a   .   .   a 
+B  a   .   a  B
+ B   a   a   B 
+h  B   a   B  h
+ h   B   B   h 
+.  h   B   h  .
+ .   h   h   . 
+a  .   h   .  a
+ a   .   .   a 
+B  a   .   a  B
+ B   a   a   B 
+h  B   a   B  h
+ h   B   B   h 
+.  h   B   h  .
+| | | | | | | |
+. a h B B h a .
+```
+
+One neat trick I realized by accident:
+Using emoji helps the distinct colors stand out
+(albeit the spacing gets wonky).
+
+```
+Uncolored pattern:
+\ \ / /
+ \ / / 
+Colored pattern:
+🔴 🟢 🔵 🟡 🟡 🔵 🟢 🔴
+| | | | | | | |
+ 🔴   🔵   🔵   🔴 
+🟢  🔴   🔵   🔴  🟢
+ 🟢   🔴   🔴   🟢 
+🟡  🟢   🔴   🟢  🟡
+ 🟡   🟢   🟢   🟡 
+🔵  🟡   🟢   🟡  🔵
+ 🔵   🟡   🟡   🔵 
+🔴  🔵   🟡   🔵  🔴
+ 🔴   🔵   🔵   🔴 
+🟢  🔴   🔵   🔴  🟢
+ 🟢   🔴   🔴   🟢 
+🟡  🟢   🔴   🟢  🟡
+ 🟡   🟢   🟢   🟡 
+🔵  🟡   🟢   🟡  🔵
+ 🔵   🟡   🟡   🔵 
+🔴  🔵   🟡   🔵  🔴
+| | | | | | | |
+🔴 🟢 🔵 🟡 🟡 🔵 🟢 🔴
+```
