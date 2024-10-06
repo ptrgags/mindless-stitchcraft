@@ -2,7 +2,6 @@ package zigzag
 
 import (
 	"errors"
-	"strings"
 
 	"github.com/ptrgags/mindless-stitchcraft/knitting"
 )
@@ -11,11 +10,11 @@ import (
 // plus a substring that went past the end of the last row by overhang stitches.
 //
 // This returns (row, overhang) for this row.
-func fillRow(overhang int, motif string, fabricWidth int) (string, int) {
+func fillRow(overhang int, motif knitting.Motif, fabricWidth int) (knitting.Row, int) {
 
 	// The actual string that went past the end of the last row, it represents
 	// the start of this row.
-	overhangStr := motif[len(motif)-overhang:]
+	overhangStr := knitting.Row(motif[len(motif)-overhang:])
 
 	// The overhang from the previous row was so long it fills the entire row
 	if overhang > fabricWidth {
@@ -30,29 +29,33 @@ func fillRow(overhang int, motif string, fabricWidth int) (string, int) {
 		nextOverhang = len(motif) - remaining
 	}
 
-	row := overhangStr + strings.Repeat(motif, repeats) + motif[:remaining]
+	left := overhangStr
+	middle := knitting.Row(motif.Repeat(uint(repeats)))
+	right := knitting.Row(motif[:remaining])
+
+	row := left
+	row = append(row, middle...)
+	row = append(row, right...)
+
 	return row, nextOverhang
 }
 
 // Generate a pattern based on repeating the motif until it aligns
 // with the width of the fabric. This works even if the motif is longer
 // than a single row!
-//
-// motif must be a valid knitting motif of knits (v) and purls (-)
-// fabricWidth must be non-zero
-func generateRawPattern(motif string, fabricWidth int) []string {
+func generateRawPattern(motif knitting.Motif, fabricWidth int) knitting.Fabric {
 	overhang := 0
-	rows := []string{}
+	fabric := knitting.Fabric{}
 	for {
-		var row string
+		var row knitting.Row
 		row, overhang = fillRow(overhang, motif, fabricWidth)
-		rows = append(rows, row)
+		fabric = append(fabric, row)
 		if overhang == 0 {
 			break
 		}
 	}
 
-	return rows
+	return fabric
 }
 
 // Possibly repeat the entire rows twice to ensure the pattern has
@@ -61,17 +64,17 @@ func generateRawPattern(motif string, fabricWidth int) []string {
 //
 // The input rows is treated as an immutable slice, a new slice is always
 // allocated.
-func ensureEvenRowCount(rows []string) []string {
-	n := len(rows)
+func ensureEvenRowCount(fabric knitting.Fabric) knitting.Fabric {
+	n := len(fabric)
 	if n%2 == 0 {
-		result := make([]string, n)
-		_ = copy(result, rows)
+		result := make(knitting.Fabric, n)
+		_ = copy(result, fabric)
 		return result
 	}
 
-	result := make([]string, 0, 2*len(rows))
-	result = append(result, rows...)
-	result = append(result, rows...)
+	result := make(knitting.Fabric, 0, 2*len(fabric))
+	result = append(result, fabric...)
+	result = append(result, fabric...)
 	return result
 }
 
@@ -83,34 +86,30 @@ func ensureEvenRowCount(rows []string) []string {
 // and vice-versa on the front. This function takes care of this.
 //
 // Rows is treated as an immutable slice, so a new slice is allocated.
-func handleReverseRows(rows []string) []string {
-	result := make([]string, len(rows))
-	_ = copy(result, rows)
+func handleReverseRows(fabric knitting.Fabric) knitting.Fabric {
+	result := make(knitting.Fabric, len(fabric))
+	_ = copy(result, fabric)
 
-	for i, row := range rows {
+	for i, row := range fabric {
 		if i%2 == 0 {
 			result[i] = row
 		} else {
-			result[i] = knitting.SwapKnitsAndPurls(knitting.ReverseRow(row))
+			result[i] = row.Reverse().SwapKnitsAndPurls()
 		}
 	}
 
 	return result
 }
 
-func GenerateZigzagPattern(motif string, fabricWidth int) ([]string, error) {
-	if err := knitting.ValidateMotif(motif); err != nil {
-		return nil, err
-	}
-
+func GenerateZigzagPattern(motif knitting.Motif, fabricWidth int) ([]string, error) {
 	if fabricWidth < 1 {
 		return nil, errors.New("fabricWidth must be a positive integer")
 	}
 
-	rows := generateRawPattern(motif, fabricWidth)
-	rows = ensureEvenRowCount(rows)
-	rows = handleReverseRows(rows)
-	rows = knitting.Rotate180(rows)
+	fabric := generateRawPattern(motif, fabricWidth)
+	fabric = ensureEvenRowCount(fabric)
+	fabric = handleReverseRows(fabric)
+	fabric = fabric.Rotate180()
 
-	return rows, nil
+	return fabric.ToStrings(), nil
 }

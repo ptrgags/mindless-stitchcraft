@@ -2,37 +2,51 @@ package knitting
 
 import (
 	"slices"
-	"strings"
 )
 
-// Take a string of stiches (either 'v' for knit or '-' for purl)
-// and swap the knits and purls. This is one part of what happens when
-// you flip the fabric over when knitting. This returns a new string
-func SwapKnitsAndPurls(stitches string) string {
-	return strings.Map(func(r rune) rune {
-		if r == 'v' {
-			return '-'
-		} else if r == '-' {
-			return 'v'
-		}
+type Row []KnitStitch
+type Fabric []Row
 
-		return r
-	}, stitches)
+// Take a row of Knits and Purls and swap each stitch type,
+// returning a new row.
+func (row Row) SwapKnitsAndPurls() Row {
+	result := make(Row, len(row))
+	for i, stitch := range row {
+		result[i] = stitch.Swap()
+	}
+	return result
 }
 
 // Reverse a string.
-func ReverseRow(s string) string {
-	result := []rune(s)
+func (row Row) Reverse() Row {
+	result := make(Row, len(row))
+	copy(result, row)
 	slices.Reverse(result)
-	return string(result)
+	return result
 }
 
-func Rotate180(rows []string) []string {
-	n := len(rows)
-	rotated := make([]string, n)
-	for i, row := range rows {
-		rotated[n-1-i] = ReverseRow(row)
+func (row Row) ToString() string {
+	runes := make([]rune, len(row))
+	for i, stitch := range row {
+		runes[i] = stitch.ToRune()
+	}
+	return string(runes)
+}
+
+func (fabric Fabric) Rotate180() Fabric {
+	n := len(fabric)
+	rotated := make(Fabric, n)
+	for i, row := range fabric {
+		rotated[n-1-i] = row.Reverse()
 	}
 
 	return rotated
+}
+
+func (fabric Fabric) ToStrings() []string {
+	result := make([]string, len(fabric))
+	for i, row := range fabric {
+		result[i] = row.ToString()
+	}
+	return result
 }

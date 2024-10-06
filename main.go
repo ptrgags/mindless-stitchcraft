@@ -8,6 +8,7 @@ import (
 
 	"github.com/ptrgags/mindless-stitchcraft/bracelets"
 	"github.com/ptrgags/mindless-stitchcraft/bracelets/repeat"
+	"github.com/ptrgags/mindless-stitchcraft/knitting"
 	"github.com/ptrgags/mindless-stitchcraft/knitting/sync"
 	"github.com/ptrgags/mindless-stitchcraft/knitting/zigzag"
 )
@@ -22,10 +23,12 @@ func knitZigzag(args []string) error {
 		return err
 	}
 
-	motif := args[1]
+	motif, err := knitting.ParseMotif(args[1])
+	if err != nil {
+		return err
+	}
 
 	rows, err := zigzag.GenerateZigzagPattern(motif, fabricWidth)
-
 	if err != nil {
 		return err
 	}
@@ -47,9 +50,18 @@ func knitSync(args []string) error {
 		return err
 	}
 
-	motifs := args[1:]
+	motifStrs := args[1:]
+	motifs := make([]knitting.Motif, len(motifStrs))
+	for i, motifStr := range motifStrs {
+		motif, err := knitting.ParseMotif(motifStr)
+		if err != nil {
+			return err
+		}
 
-	rows, err := sync.GeneratePattern(fabricWidth, motifs)
+		motifs[i] = motif
+	}
+
+	rows, err := sync.GeneratePattern(uint(fabricWidth), motifs)
 
 	if err != nil {
 		return err

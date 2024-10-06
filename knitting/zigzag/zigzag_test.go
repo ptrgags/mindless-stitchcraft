@@ -4,31 +4,12 @@ import (
 	"testing"
 
 	"github.com/ptrgags/mindless-stitchcraft/checks"
+	"github.com/ptrgags/mindless-stitchcraft/knitting"
 )
 
 func TestGenerateZigzagPattern(t *testing.T) {
-	t.Run("invalid motif returns error", func(t *testing.T) {
-		validFabricWidth := 5
-		cases := []struct {
-			label         string
-			motif         string
-			expectedError string
-		}{
-			{"motif empty", "", "motif must not be empty"},
-			{"motif has invalid characters", "--🧶vv", "motif has invalid characters"},
-		}
-
-		for _, tc := range cases {
-			t.Run(tc.label, func(t *testing.T) {
-				rows, err := GenerateZigzagPattern(tc.motif, validFabricWidth)
-
-				checks.CheckHasError(t, rows, err, tc.expectedError)
-			})
-		}
-	})
-
 	t.Run("invalid fabricWidth returns error", func(t *testing.T) {
-		validMotif := "v--v-"
+		validMotif, _ := knitting.ParseMotif("v--v-")
 		cases := []struct {
 			label       string
 			fabricWidth int
@@ -67,7 +48,8 @@ func TestGenerateZigzagPattern(t *testing.T) {
 
 		for _, tc := range cases {
 			t.Run(tc.label, func(t *testing.T) {
-				rows, err := GenerateZigzagPattern(tc.motif, tc.fabricWidth)
+				motif, _ := knitting.ParseMotif(tc.motif)
+				rows, err := GenerateZigzagPattern(motif, tc.fabricWidth)
 
 				checks.CheckHasNoError(t, rows, err)
 				checks.CheckStringGridShape(t, rows, tc.fabricWidth, tc.expectedHeight)
@@ -100,7 +82,8 @@ func TestGenerateZigzagPattern(t *testing.T) {
 
 		for _, tc := range cases {
 			t.Run(tc.label, func(t *testing.T) {
-				rows, err := GenerateZigzagPattern(tc.motif, tc.fabricWidth)
+				motif, _ := knitting.ParseMotif(tc.motif)
+				rows, err := GenerateZigzagPattern(motif, tc.fabricWidth)
 
 				checks.CheckHasNoError(t, rows, err)
 				checks.CheckStringGridShape(t, rows, tc.fabricWidth, tc.expectedHeight)
@@ -144,7 +127,8 @@ func TestGenerateZigzagPattern(t *testing.T) {
 		}
 		for _, tc := range cases {
 			t.Run(tc.label, func(t *testing.T) {
-				rows, err := GenerateZigzagPattern(tc.motif, tc.fabricWidth)
+				motif, _ := knitting.ParseMotif(tc.motif)
+				rows, err := GenerateZigzagPattern(motif, tc.fabricWidth)
 
 				checks.CheckHasNoError(t, rows, err)
 				checks.CheckStringGridsEqual(t, rows, tc.expectedRows)
@@ -199,7 +183,8 @@ func TestGenerateZigzagPattern(t *testing.T) {
 
 		for _, tc := range cases {
 			t.Run(tc.label, func(t *testing.T) {
-				rows, err := GenerateZigzagPattern(tc.motif, tc.fabricWidth)
+				motif, _ := knitting.ParseMotif(tc.motif)
+				rows, err := GenerateZigzagPattern(motif, tc.fabricWidth)
 
 				checks.CheckHasNoError(t, rows, err)
 				checks.CheckStringGridsEqual(t, rows, tc.expectedRows)
