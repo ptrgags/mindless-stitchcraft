@@ -36,7 +36,7 @@ func TestGeneratePattern(t *testing.T) {
 			"v--v--v--v",
 		}
 		checks.CheckHasNoError(t, result, err)
-		checks.CheckStringGridsEqual(t, result, expectedPattern)
+		checks.CheckSlicesEqual(t, result, expectedPattern)
 	})
 
 	t.Run("Long motif is truncated to the fabric width", func(t *testing.T) {
@@ -50,6 +50,6 @@ func TestGeneratePattern(t *testing.T) {
 			"vv--",
 		}
 		checks.CheckHasNoError(t, result, err)
-		checks.CheckStringGridsEqual(t, result, expectedPattern)
+		checks.CheckSlicesEqual(t, result, expectedPattern)
 	})
 }

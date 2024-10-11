@@ -44,7 +44,7 @@ func TestGenerateUncoloredPattern(t *testing.T) {
 			" > < ",
 		}
 		checks.CheckHasNoError(t, result, err)
-		checks.CheckStringGridsEqual(t, result, expected)
+		checks.CheckSlicesEqual(t, result, expected)
 	})
 
 	t.Run("Motif that takes multiple rows formats pattern correctly", func(t *testing.T) {
@@ -64,6 +64,6 @@ func TestGenerateUncoloredPattern(t *testing.T) {
 			` \ < `,
 		}
 		checks.CheckHasNoError(t, result, err)
-		checks.CheckStringGridsEqual(t, result, expected)
+		checks.CheckSlicesEqual(t, result, expected)
 	})
 }

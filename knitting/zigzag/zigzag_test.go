@@ -131,7 +131,7 @@ func TestGenerateZigzagPattern(t *testing.T) {
 				rows, err := GenerateZigzagPattern(motif, tc.fabricWidth)
 
 				checks.CheckHasNoError(t, rows, err)
-				checks.CheckStringGridsEqual(t, rows, tc.expectedRows)
+				checks.CheckSlicesEqual(t, rows, tc.expectedRows)
 			})
 		}
 	})
@@ -187,7 +187,7 @@ func TestGenerateZigzagPattern(t *testing.T) {
 				rows, err := GenerateZigzagPattern(motif, tc.fabricWidth)
 
 				checks.CheckHasNoError(t, rows, err)
-				checks.CheckStringGridsEqual(t, rows, tc.expectedRows)
+				checks.CheckSlicesEqual(t, rows, tc.expectedRows)
 			})
 		}
 	})
