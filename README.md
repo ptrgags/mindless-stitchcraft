@@ -59,7 +59,7 @@ go build -o mindless-stitchcraft main.go
 Below is a list of the pattern types currently available in this repo, and
 a description of the options.
 
-### Knitting: Zigzag
+### Knitting: Zigzag (2024)
 
 This method takes a simple motif of knits `v` and purls `-` and repeats
 them over and over (knitting flat). At the end of the row, flip the fabric
@@ -95,7 +95,7 @@ Examples:
 This first example has a motif that repeats many times:
 
 ```
-mindless-stitchcraft 10 "v--"
+mindless-stitchcraft knit-zigzag 10 "v--"
 
 Output:
 v-vv-vv-vv
@@ -111,13 +111,61 @@ a motif of length 3 that evenly divides 9. This pattern repeats after only
 2 rows!
 
 ```
-mindless-stitchcraft 9 "v--"
+mindless-stitchcraft knit-zigzag 9 "v--"
 
 -vv-vv-vv
 --v--v--v
 ```
 
-### Friendship Bracelets: Repeat
+### Knitting: Sync (2024)
+
+On closer inspection of one of the sample images from [Sequence Knitting](https://ceceliacampochiaro.com/sequence-knitting/), I realized that the technique shown was simpler:
+at the start of a new row, restart at the beginning of the motif instead
+of continuing. 
+
+This will produce 2-row patterns in general (one on each side of the fabric).
+To add more variation, I allow specifying multiple motifs. The program will
+cycle through these from row to row.
+
+I call this mode `knit-sync` because the act of restarting the periodic pattern
+at the end of the row reminds me of oscillator sync on synthesizers.
+
+Usage:
+
+```
+mindless-stitchcraft knit-sync FABRIC_WIDTH MOTIF [MOTIF ...]
+```
+
+| Argument | Description |
+| --- | --- |
+| `FABRIC_WIDTH` | How many stitches wide is the fabric? |
+| `MOTIF` | A string of knits (`v`) and purls (`-`) listed in the order you stitch them. E.g. `vv---v--` means "k2 p3 k1 p2" |
+
+Examples:
+
+Simple example with a single motif:
+
+```
+mindless-stitchcraft knit-sync 10 "v--"
+
+-vv-vv-vv-  --> motif (reverse)
+v--v--v--v  <-- motif
+```
+
+An example that uses multiple motifs to make a more interesting pattern:
+
+```
+mindless-stitchcraft knit-sync 10 "vvv--" "vvv--" "v----"
+
+-vvvv-vvvv  --> third motif (reverse)
+--vvv--vvv  <-- second motif
+---vv---vv  --> first motif (reverse)
+----v----v  <-- third motif
+---vv---vv  --> second motif (reverse)
+--vvv--vvv  <-- first motif
+```
+
+### Friendship Bracelets: Repeat (2024)
 
 I took the concept of repeating a motif and applied it to friendship
 bracelets. 
@@ -147,7 +195,7 @@ slots from left to right like this:
 Usage:
 
 ```
-mindless-stitchcraft knit-zigzag STRAND_COUNT MOTIF
+mindless-stitchcraft bracelet-repeat STRAND_COUNT MOTIF
 ```
 
 Where:
@@ -212,6 +260,8 @@ Using emoji helps the distinct colors stand out
 (albeit the spacing gets wonky).
 
 ```
+mindless-stitchcraft bracelet-repeat '🔴 🟢 🔵 🟡 🟡 🔵 🟢 🔴' '\\//\//'
+
 Uncolored pattern:
 \ \ / /
  \ / / 
