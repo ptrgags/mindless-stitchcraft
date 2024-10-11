@@ -15,15 +15,3 @@ func CheckStringGridShape(t *testing.T, rows []string, expectedWidth int, expect
 		}
 	}
 }
-
-func CheckStringGridsEqual(t *testing.T, actual []string, expected []string) {
-	if len(actual) != len(expected) {
-		t.Errorf("Lengths don't match: len(actual)=%v, len(expected)=%v, actual=%v, expected=%v", len(actual), len(expected), actual, expected)
-	}
-
-	for i, actualRow := range actual {
-		if actualRow != expected[i] {
-			t.Errorf("Row mismatch at position %d: %v, %v actual=%v, expected=%v", i, actualRow, expected[i], actual, expected)
-		}
-	}
-}

@@ -79,7 +79,7 @@ func TestGenerateColoredPattern(t *testing.T) {
 			"A B",
 		}
 		checks.CheckHasNoError(t, result, err)
-		checks.CheckStringGridsEqual(t, result, expectedPattern)
+		checks.CheckSlicesEqual(t, result, expectedPattern)
 	})
 
 	t.Run("Two strand pattern that does not swap strands produces the correct pattern", func(t *testing.T) {
@@ -97,20 +97,7 @@ func TestGenerateColoredPattern(t *testing.T) {
 			"A B",
 		}
 		checks.CheckHasNoError(t, result, err)
-		checks.CheckStringGridsEqual(t, result, expectedPattern)
-	})
-
-	t.Run("pattern without repeats produces the correct shape", func(t *testing.T) {
-		strands := []rune("ABCD")
-		exactFitMotif, _ := bracelets.ParseKnots("<><") // seems fishy 🤔
-
-		result, err := GenerateColoredPattern(strands, exactFitMotif)
-
-		// The motif exactly fits 2 rows, and doesn't swap strands
-		expectedWidth := 7
-		expectedHeight := 6 // 2 rows + 4 header/footer
-		checks.CheckHasNoError(t, result, err)
-		checks.CheckStringGridShape(t, result, expectedWidth, expectedHeight)
+		checks.CheckSlicesEqual(t, result, expectedPattern)
 	})
 
 	t.Run("pattern without repeats produces the correct pattern", func(t *testing.T) {
@@ -129,21 +116,7 @@ func TestGenerateColoredPattern(t *testing.T) {
 			"A B C D",
 		}
 		checks.CheckHasNoError(t, result, err)
-		checks.CheckStringGridsEqual(t, result, expectedPattern)
-	})
-
-	t.Run("pattern with repeats produces the correct shape", func(t *testing.T) {
-		strands := []rune("ABCD")
-		exactFitMotif, _ := bracelets.ParseKnots(`//\`)
-
-		result, err := GenerateColoredPattern(strands, exactFitMotif)
-
-		// The motif exactly fits 2 rows, but due to swapping it takes 4 repeats
-		// to permute the strands back
-		expectedWidth := 7
-		expectedHeight := 12 // 4 * 2 rows + 4 header/footer
-		checks.CheckHasNoError(t, result, err)
-		checks.CheckStringGridShape(t, result, expectedWidth, expectedHeight)
+		checks.CheckSlicesEqual(t, result, expectedPattern)
 	})
 
 	t.Run("pattern with repeats produces the correct pattern", func(t *testing.T) {
@@ -169,7 +142,7 @@ func TestGenerateColoredPattern(t *testing.T) {
 			"A B C D",
 		}
 		checks.CheckHasNoError(t, result, err)
-		checks.CheckStringGridsEqual(t, result, expectedPattern)
+		checks.CheckSlicesEqual(t, result, expectedPattern)
 	})
 
 	t.Run("Motif shorter than 2 rows produces the correct pattern", func(t *testing.T) {
@@ -189,7 +162,7 @@ func TestGenerateColoredPattern(t *testing.T) {
 			"A B C D",
 		}
 		checks.CheckHasNoError(t, result, err)
-		checks.CheckStringGridsEqual(t, result, expectedPattern)
+		checks.CheckSlicesEqual(t, result, expectedPattern)
 	})
 
 	t.Run("motif longer than 2 rows produces the correct pattern", func(t *testing.T) {
@@ -213,7 +186,7 @@ func TestGenerateColoredPattern(t *testing.T) {
 			"A B C D",
 		}
 		checks.CheckHasNoError(t, result, err)
-		checks.CheckStringGridsEqual(t, result, expectedPattern)
+		checks.CheckSlicesEqual(t, result, expectedPattern)
 	})
 
 	t.Run("motif with mixed knots types produces the correct pattern", func(t *testing.T) {
@@ -237,7 +210,7 @@ func TestGenerateColoredPattern(t *testing.T) {
 			"A B C D",
 		}
 		checks.CheckHasNoError(t, result, err)
-		checks.CheckStringGridsEqual(t, result, expectedPattern)
+		checks.CheckSlicesEqual(t, result, expectedPattern)
 	})
 
 	// Design choice. Easier to implement this way.
@@ -258,7 +231,7 @@ func TestGenerateColoredPattern(t *testing.T) {
 			"A A B B",
 		}
 		checks.CheckHasNoError(t, result, err)
-		checks.CheckStringGridsEqual(t, result, expectedPattern)
+		checks.CheckSlicesEqual(t, result, expectedPattern)
 	})
 
 	t.Run("Pattern with only ForwardBackward and BackwardForward knots produces a short pattern", func(t *testing.T) {
@@ -276,6 +249,6 @@ func TestGenerateColoredPattern(t *testing.T) {
 			"A B C D E F",
 		}
 		checks.CheckHasNoError(t, result, err)
-		checks.CheckStringGridsEqual(t, result, expectedPattern)
+		checks.CheckSlicesEqual(t, result, expectedPattern)
 	})
 }
